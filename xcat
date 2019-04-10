@@ -1,0 +1,994 @@
+#!/bin/bash
+
+IFSBAK=$IFS
+IFS=$(echo -en "\n\b")
+FORCE=0
+ECHOMIMEONLY=0
+#set -x
+function deduce_extension_from_mimetype() {
+	local mimetype=$(file -b --mime-type -- "$1")
+
+	case $mimetype in
+	inode/directory) echo $mimetype ;;
+	application/andrew-inset) echo "N/A" ;;
+	application/applixware) echo "aw" ;;
+	application/atomcat+xml) echo "atomcat" ;;
+	application/atomsvc+xml) echo "atomsvc" ;;
+	application/atom+xml) echo "xml" ;;
+	application/ccxml+xml) echo "ccxml" ;;
+	application/cdmi-capability) echo "cdmia" ;;
+	application/cdmi-container) echo "cdmic" ;;
+	application/cdmi-domain) echo "cdmid" ;;
+	application/cdmi-object) echo "cdmio" ;;
+	application/cdmi-queue) echo "cdmiq" ;;
+	application/cu-seeme) echo "cu" ;;
+	application/davmount+xml) echo "davmount" ;;
+	application/dssc+der) echo "dssc" ;;
+	application/dssc+xml) echo "xdssc" ;;
+	application/ecmascript) echo "es" ;;
+	application/emma+xml) echo "emma" ;;
+	application/epub+zip) echo "epub" ;;
+	application/exi) echo "exi" ;;
+	application/font-tdpfr) echo "pfr" ;;
+	application/gzip) echo "gz" ;;
+	application/hyperstudio) echo "stk" ;;
+	application/ipfix) echo "ipfix" ;;
+	application/java-archive) echo "jar" ;;
+	application/javascript) echo "js" ;;
+	application/java-serialized-object) echo "ser" ;;
+	application/java-vm) echo "class" ;;
+	application/json) echo "json" ;;
+	application/mac-binhex40) echo "hqx" ;;
+	application/mac-compactpro) echo "cpt" ;;
+	application/mads+xml) echo "mads" ;;
+	application/marc) echo "mrc" ;;
+	application/marcxml+xml) echo "mrcx" ;;
+	application/mathematica) echo "ma" ;;
+	application/mathml+xml) echo "mathml" ;;
+	application/mbox) echo "mbox" ;;
+	application/mediaservercontrol+xml) echo "mscml" ;;
+	application/metalink4+xml) echo "meta4" ;;
+	application/mets+xml) echo "mets" ;;
+	application/mods+xml) echo "mods" ;;
+	application/mp21) echo "m21" ;;
+	application/mp4) echo "mp4" ;;
+	application/msword) echo "doc" ;;
+	application/mxf) echo "mxf" ;;
+	application/octet-stream) echo "bin" ;;
+	application/oda) echo "oda" ;;
+	application/oebps-package+xml) echo "opf" ;;
+	application/ogg) echo "ogx" ;;
+	application/onenote) echo "onetoc" ;;
+	application/patch-ops-error+xml) echo "xer" ;;
+	application/pdf) echo "pdf" ;;
+	application/pgp-encrypted) echo "pgp" ;;
+	application/pgp-signature) echo "pgp" ;;
+	application/pics-rules) echo "prf" ;;
+	application/pkcs10) echo "p10" ;;
+	application/pkcs7-mime) echo "p7m" ;;
+	application/pkcs7-signature) echo "p7s" ;;
+	application/pkcs8) echo "p8" ;;
+	application/pkix-attr-cert) echo "ac" ;;
+	application/pkix-cert) echo "cer" ;;
+	application/pkixcmp) echo "pki" ;;
+	application/pkix-crl) echo "crl" ;;
+	application/pkix-pkipath) echo "pkipath" ;;
+	application/pls+xml) echo "pls" ;;
+	application/postscript) echo "ai" ;;
+	application/prs.cww) echo "cww" ;;
+	application/pskc+xml) echo "pskcxml" ;;
+	application/rdf+xml) echo "rdf" ;;
+	application/reginfo+xml) echo "rif" ;;
+	application/relax-ng-compact-syntax) echo "rnc" ;;
+	application/resource-lists-diff+xml) echo "rld" ;;
+	application/resource-lists+xml) echo "rl" ;;
+	application/rls-services+xml) echo "rs" ;;
+	application/rsd+xml) echo "rsd" ;;
+	application/rss+xml) echo "xml" ;;
+	application/rtf) echo "rtf" ;;
+	application/sbml+xml) echo "sbml" ;;
+	application/scvp-cv-request) echo "scq" ;;
+	application/scvp-cv-response) echo "scs" ;;
+	application/scvp-vp-request) echo "spq" ;;
+	application/scvp-vp-response) echo "spp" ;;
+	application/sdp) echo "sdp" ;;
+	application/set-payment-initiation) echo "setpay" ;;
+	application/set-registration-initiation) echo "setreg" ;;
+	application/shf+xml) echo "shf" ;;
+	application/smil+xml) echo "smi" ;;
+	application/sparql-query) echo "rq" ;;
+	application/sparql-results+xml) echo "srx" ;;
+	application/srgs) echo "gram" ;;
+	application/srgs+xml) echo "grxml" ;;
+	application/sru+xml) echo "sru" ;;
+	application/ssml+xml) echo "ssml" ;;
+	application/tei+xml) echo "tei" ;;
+	application/thraud+xml) echo "tfi" ;;
+	application/timestamped-data) echo "tsd" ;;
+	application/vnd.3gpp2.tcap) echo "tcap" ;;
+	application/vnd.3gpp.pic-bw-large) echo "plb" ;;
+	application/vnd.3gpp.pic-bw-small) echo "psb" ;;
+	application/vnd.3gpp.pic-bw-var) echo "pvb" ;;
+	application/vnd.3m.post-it-notes) echo "pwn" ;;
+	application/vnd.accpac.simply.aso) echo "aso" ;;
+	application/vnd.accpac.simply.imp) echo "imp" ;;
+	application/vnd.acucobol) echo "acu" ;;
+	application/vnd.acucorp) echo "atc" ;;
+	application/vnd.adobe.air-application-installer-package+zip) echo "air" ;;
+	application/vnd.adobe.fxp) echo "fxp" ;;
+	application/vnd.adobe.xdp+xml) echo "xdp" ;;
+	application/vnd.adobe.xfdf) echo "xfdf" ;;
+	application/vnd.ahead.space) echo "ahead" ;;
+	application/vnd.airzip.filesecure.azf) echo "azf" ;;
+	application/vnd.airzip.filesecure.azs) echo "azs" ;;
+	application/vnd.amazon.ebook) echo "azw" ;;
+	application/vnd.americandynamics.acc) echo "acc" ;;
+	application/vnd.amiga.ami) echo "ami" ;;
+	application/vnd.android.package-archive) echo "apk" ;;
+	application/vnd.anser-web-certificate-issue-initiation) echo "cii" ;;
+	application/vnd.anser-web-funds-transfer-initiation) echo "fti" ;;
+	application/vnd.antix.game-component) echo "atx" ;;
+	application/vnd.apple.installer+xml) echo "mpkg" ;;
+	application/vnd.apple.mpegurl) echo "m3u8" ;;
+	application/vnd.aristanetworks.swi) echo "swi" ;;
+	application/vnd.audiograph) echo "aep" ;;
+	application/vnd.blueice.multipass) echo "mpm" ;;
+	application/vnd.bmi) echo "bmi" ;;
+	application/vnd.businessobjects) echo "rep" ;;
+	application/vnd.chemdraw+xml) echo "cdxml" ;;
+	application/vnd.chipnuts.karaoke-mmd) echo "mmd" ;;
+	application/vnd.cinderella) echo "cdy" ;;
+	application/vnd.claymore) echo "cla" ;;
+	application/vnd.cloanto.rp9) echo "rp9" ;;
+	application/vnd.clonk.c4group) echo "c4g" ;;
+	application/vnd.cluetrust.cartomobile-config) echo "c11amc" ;;
+	application/vnd.cluetrust.cartomobile-config-pkg) echo "c11amz" ;;
+	application/vnd.commonspace) echo "csp" ;;
+	application/vnd.contact.cmsg) echo "cdbcmsg" ;;
+	application/vnd.cosmocaller) echo "cmc" ;;
+	application/vnd.crick.clicker) echo "clkx" ;;
+	application/vnd.crick.clicker.keyboard) echo "clkk" ;;
+	application/vnd.crick.clicker.palette) echo "clkp" ;;
+	application/vnd.crick.clicker.template) echo "clkt" ;;
+	application/vnd.crick.clicker.wordbank) echo "clkw" ;;
+	application/vnd.criticaltools.wbs+xml) echo "wbs" ;;
+	application/vnd.ctc-posml) echo "pml" ;;
+	application/vnd.cups-ppd) echo "ppd" ;;
+	application/vnd.curl.car) echo "car" ;;
+	application/vnd.curl.pcurl) echo "pcurl" ;;
+	application/vnd.data-vision.rdz) echo "rdz" ;;
+	application/vnd.debian.binary-package) echo "deb" ;;
+	application/vnd.denovo.fcselayout-link) echo "fe_launch" ;;
+	application/vnd.dna) echo "dna" ;;
+	application/vnd.dolby.mlp) echo "mlp" ;;
+	application/vnd.dpgraph) echo "dpg" ;;
+	application/vnd.dreamfactory) echo "dfac" ;;
+	application/vnd.dvb.ait) echo "ait" ;;
+	application/vnd.dvb.service) echo "svc" ;;
+	application/vnd.dynageo) echo "geo" ;;
+	application/vnd.ecowin.chart) echo "mag" ;;
+	application/vnd.enliven) echo "nml" ;;
+	application/vnd.epson.esf) echo "esf" ;;
+	application/vnd.epson.msf) echo "msf" ;;
+	application/vnd.epson.quickanime) echo "qam" ;;
+	application/vnd.epson.salt) echo "slt" ;;
+	application/vnd.epson.ssf) echo "ssf" ;;
+	application/vnd.eszigno3+xml) echo "es3" ;;
+	application/vnd.ezpix-album) echo "ez2" ;;
+	application/vnd.ezpix-package) echo "ez3" ;;
+	application/vnd.fdf) echo "fdf" ;;
+	application/vnd.fdsn.seed) echo "seed" ;;
+	application/vnd.flographit) echo "gph" ;;
+	application/vnd.fluxtime.clip) echo "ftc" ;;
+	application/vnd.framemaker) echo "fm" ;;
+	application/vnd.frogans.fnc) echo "fnc" ;;
+	application/vnd.frogans.ltf) echo "ltf" ;;
+	application/vnd.fsc.weblaunch) echo "fsc" ;;
+	application/vnd.fujitsu.oasys2) echo "oa2" ;;
+	application/vnd.fujitsu.oasys3) echo "oa3" ;;
+	application/vnd.fujitsu.oasys) echo "oas" ;;
+	application/vnd.fujitsu.oasysgp) echo "fg5" ;;
+	application/vnd.fujitsu.oasysprs) echo "bh2" ;;
+	application/vnd.fujixerox.ddd) echo "ddd" ;;
+	application/vnd.fujixerox.docuworks.binder) echo "xbd" ;;
+	application/vnd.fujixerox.docuworks) echo "xdw" ;;
+	application/vnd.fuzzysheet) echo "fzs" ;;
+	application/vnd.genomatix.tuxedo) echo "txd" ;;
+	application/vnd.geogebra.file) echo "ggb" ;;
+	application/vnd.geogebra.tool) echo "ggt" ;;
+	application/vnd.geometry-explorer) echo "gex" ;;
+	application/vnd.geonext) echo "gxt" ;;
+	application/vnd.geoplan) echo "g2w" ;;
+	application/vnd.geospace) echo "g3w" ;;
+	application/vnd.gmx) echo "gmx" ;;
+	application/vnd.google-earth.kml+xml) echo "kml" ;;
+	application/vnd.google-earth.kmz) echo "kmz" ;;
+	application/vnd.grafeq) echo "gqf" ;;
+	application/vnd.groove-account) echo "gac" ;;
+	application/vnd.groove-help) echo "ghf" ;;
+	application/vnd.groove-identity-message) echo "gim" ;;
+	application/vnd.groove-injector) echo "grv" ;;
+	application/vnd.groove-tool-message) echo "gtm" ;;
+	application/vnd.groove-tool-template) echo "tpl" ;;
+	application/vnd.groove-vcard) echo "vcg" ;;
+	application/vnd.hal+xml) echo "hal" ;;
+	application/vnd.handheld-entertainment+xml) echo "zmm" ;;
+	application/vnd.hbci) echo "hbci" ;;
+	application/vnd.hhe.lesson-player) echo "les" ;;
+	application/vnd.hp-hpgl) echo "hpgl" ;;
+	application/vnd.hp-hpid) echo "hpid" ;;
+	application/vnd.hp-hps) echo "hps" ;;
+	application/vnd.hp-jlyt) echo "jlt" ;;
+	application/vnd.hp-pcl) echo "pcl" ;;
+	application/vnd.hp-pclxl) echo "pclxl" ;;
+	application/vnd.hydrostatix.sof-data) echo "sfd-hdstx" ;;
+	application/vnd.hzn-3d-crossword) echo "x3d" ;;
+	application/vnd.ibm.minipay) echo "mpy" ;;
+	application/vnd.ibm.modcap) echo "afp" ;;
+	application/vnd.ibm.rights-management) echo "irm" ;;
+	application/vnd.ibm.secure-container) echo "sc" ;;
+	application/vnd.iccprofile) echo "icc" ;;
+	application/vnd.igloader) echo "igl" ;;
+	application/vnd.immervision-ivp) echo "ivp" ;;
+	application/vnd.immervision-ivu) echo "ivu" ;;
+	application/vnd.insors.igm) echo "igm" ;;
+	application/vnd.intercon.formnet) echo "xpw" ;;
+	application/vnd.intergeo) echo "i2g" ;;
+	application/vnd.intu.qbo) echo "qbo" ;;
+	application/vnd.intu.qfx) echo "qfx" ;;
+	application/vnd.ipunplugged.rcprofile) echo "rcprofile" ;;
+	application/vnd.irepository.package+xml) echo "irp" ;;
+	application/vnd.isac.fcs) echo "fcs" ;;
+	application/vnd.is-xpr) echo "xpr" ;;
+	application/vnd.jam) echo "jam" ;;
+	application/vnd.jcp.javame.midlet-rms) echo "rms" ;;
+	application/vnd.jisp) echo "jisp" ;;
+	application/vnd.joost.joda-archive) echo "joda" ;;
+	application/vnd.kahootz) echo "ktz" ;;
+	application/vnd.kde.karbon) echo "karbon" ;;
+	application/vnd.kde.kchart) echo "chrt" ;;
+	application/vnd.kde.kformula) echo "kfo" ;;
+	application/vnd.kde.kivio) echo "flw" ;;
+	application/vnd.kde.kontour) echo "kon" ;;
+	application/vnd.kde.kpresenter) echo "kpr" ;;
+	application/vnd.kde.kspread) echo "ksp" ;;
+	application/vnd.kde.kword) echo "kwd" ;;
+	application/vnd.kenameaapp) echo "htke" ;;
+	application/vnd.kidspiration) echo "kia" ;;
+	application/vnd.kinar) echo "kne" ;;
+	application/vnd.koan) echo "skp" ;;
+	application/vnd.kodak-descriptor) echo "sse" ;;
+	application/vnd.las.las+xml) echo "lasxml" ;;
+	application/vnd.llamagraphics.life-balance.desktop) echo "lbd" ;;
+	application/vnd.llamagraphics.life-balance.exchange+xml) echo "lbe" ;;
+	application/vnd.lotus-1-2-3) echo "0.123" ;;
+	application/vnd.lotus-approach) echo "apr" ;;
+	application/vnd.lotus-freelance) echo "pre" ;;
+	application/vnd.lotus-notes) echo "nsf" ;;
+	application/vnd.lotus-organizer) echo "org" ;;
+	application/vnd.lotus-screencam) echo "scm" ;;
+	application/vnd.lotus-wordpro) echo "lwp" ;;
+	application/vnd.macports.portpkg) echo "portpkg" ;;
+	application/vnd.mcd) echo "mcd" ;;
+	application/vnd.medcalcdata) echo "mc1" ;;
+	application/vnd.mediastation.cdkey) echo "cdkey" ;;
+	application/vnd.mfer) echo "mwf" ;;
+	application/vnd.mfmp) echo "mfm" ;;
+	application/vnd.micrografx.flo) echo "flo" ;;
+	application/vnd.micrografx.igx) echo "igx" ;;
+	application/vnd.mif) echo "mif" ;;
+	application/vnd.mobius.daf) echo "daf" ;;
+	application/vnd.mobius.dis) echo "dis" ;;
+	application/vnd.mobius.mbk) echo "mbk" ;;
+	application/vnd.mobius.mqy) echo "mqy" ;;
+	application/vnd.mobius.msl) echo "msl" ;;
+	application/vnd.mobius.plc) echo "plc" ;;
+	application/vnd.mobius.txf) echo "txf" ;;
+	application/vnd.mophun.application) echo "mpn" ;;
+	application/vnd.mophun.certificate) echo "mpc" ;;
+	application/vnd.mozilla.xul+xml) echo "xul" ;;
+	application/vnd.ms-artgalry) echo "cil" ;;
+	application/vnd.ms-cab-compressed) echo "cab" ;;
+	application/vnd.mseq) echo "mseq" ;;
+	application/vnd.ms-excel.addin.macroenabled.12) echo "xlam" ;;
+	application/vnd.ms-excel) echo "xls" ;;
+	application/vnd.ms-excel.sheet.binary.macroenabled.12) echo "xlsb" ;;
+	application/vnd.ms-excel.sheet.macroenabled.12) echo "xlsm" ;;
+	application/vnd.ms-excel.template.macroenabled.12) echo "xltm" ;;
+	application/vnd.ms-fontobject) echo "eot" ;;
+	application/vnd.ms-htmlhelp) echo "chm" ;;
+	application/vnd.ms-ims) echo "ims" ;;
+	application/vnd.ms-lrm) echo "lrm" ;;
+	application/vnd.ms-officetheme) echo "thmx" ;;
+	application/vnd.ms-pki.seccat) echo "cat" ;;
+	application/vnd.ms-pki.stl) echo "stl" ;;
+	application/vnd.ms-powerpoint.addin.macroenabled.12) echo "ppam" ;;
+	application/vnd.ms-powerpoint) echo "ppt" ;;
+	application/vnd.ms-powerpoint.presentation.macroenabled.12) echo "pptm" ;;
+	application/vnd.ms-powerpoint.slide.macroenabled.12) echo "sldm" ;;
+	application/vnd.ms-powerpoint.slideshow.macroenabled.12) echo "ppsm" ;;
+	application/vnd.ms-powerpoint.template.macroenabled.12) echo "potm" ;;
+	application/vnd.ms-project) echo "mpp" ;;
+	application/vnd.ms-word.document.macroenabled.12) echo "docm" ;;
+	application/vnd.ms-word.template.macroenabled.12) echo "dotm" ;;
+	application/vnd.ms-works) echo "wps" ;;
+	application/vnd.ms-wpl) echo "wpl" ;;
+	application/vnd.ms-xpsdocument) echo "xps" ;;
+	application/vnd.musician) echo "mus" ;;
+	application/vnd.muvee.style) echo "msty" ;;
+	application/vnd.neurolanguage.nlu) echo "nlu" ;;
+	application/vnd.noblenet-directory) echo "nnd" ;;
+	application/vnd.noblenet-sealer) echo "nns" ;;
+	application/vnd.noblenet-web) echo "nnw" ;;
+	application/vnd.nokia.n-gage.data) echo "ngdat" ;;
+	application/vnd.nokia.n-gage.symbian.install) echo "n-gage" ;;
+	application/vnd.nokia.radio-preset) echo "rpst" ;;
+	application/vnd.nokia.radio-presets) echo "rpss" ;;
+	application/vnd.novadigm.edm) echo "edm" ;;
+	application/vnd.novadigm.edx) echo "edx" ;;
+	application/vnd.novadigm.ext) echo "ext" ;;
+	application/vnd.oasis.opendocument.chart) echo "odc" ;;
+	application/vnd.oasis.opendocument.chart-template) echo "otc" ;;
+	application/vnd.oasis.opendocument.database) echo "odb" ;;
+	application/vnd.oasis.opendocument.formula) echo "odf" ;;
+	application/vnd.oasis.opendocument.formula-template) echo "odft" ;;
+	application/vnd.oasis.opendocument.graphics) echo "odg" ;;
+	application/vnd.oasis.opendocument.graphics-template) echo "otg" ;;
+	application/vnd.oasis.opendocument.image) echo "odi" ;;
+	application/vnd.oasis.opendocument.image-template) echo "oti" ;;
+	application/vnd.oasis.opendocument.presentation) echo "odp" ;;
+	application/vnd.oasis.opendocument.presentation-template) echo "otp" ;;
+	application/vnd.oasis.opendocument.spreadsheet) echo "ods" ;;
+	application/vnd.oasis.opendocument.spreadsheet-template) echo "ots" ;;
+	application/vnd.oasis.opendocument.text) echo "odt" ;;
+	application/vnd.oasis.opendocument.text-master) echo "odm" ;;
+	application/vnd.oasis.opendocument.text-template) echo "ott" ;;
+	application/vnd.oasis.opendocument.text-web) echo "oth" ;;
+	application/vnd.olpc-sugar) echo "xo" ;;
+	application/vnd.oma.dd2+xml) echo "dd2" ;;
+	application/vnd.openofficeorg.extension) echo "oxt" ;;
+	application/vnd.openxmlformats-officedocument.presentationml.presentation) echo "pptx" ;;
+	application/vnd.openxmlformats-officedocument.presentationml.slide) echo "sldx" ;;
+	application/vnd.openxmlformats-officedocument.presentationml.slideshow) echo "ppsx" ;;
+	application/vnd.openxmlformats-officedocument.presentationml.template) echo "potx" ;;
+	application/vnd.openxmlformats-officedocument.spreadsheetml.sheet) echo "xlsx" ;;
+	application/vnd.openxmlformats-officedocument.spreadsheetml.template) echo "xltx" ;;
+	application/vnd.openxmlformats-officedocument.wordprocessingml.document) echo "docx" ;;
+	application/vnd.openxmlformats-officedocument.wordprocessingml.template) echo "dotx" ;;
+	application/vnd.osgeo.mapguide.package) echo "mgp" ;;
+	application/vnd.osgi.dp) echo "dp" ;;
+	application/vnd.palm) echo "pdb" ;;
+	application/vnd.pawaafile) echo "paw" ;;
+	application/vnd.pg.format) echo "str" ;;
+	application/vnd.pg.osasli) echo "ei6" ;;
+	application/vnd.picsel) echo "efif" ;;
+	application/vnd.pmi.widget) echo "wg" ;;
+	application/vnd.pocketlearn) echo "plf" ;;
+	application/vnd.powerbuilder6) echo "pbd" ;;
+	application/vnd.previewsystems.box) echo "box" ;;
+	application/vnd.proteus.magazine) echo "mgz" ;;
+	application/vnd.publishare-delta-tree) echo "qps" ;;
+	application/vnd.pvi.ptid1) echo "ptid" ;;
+	application/vnd.quark.quarkxpress) echo "qxd" ;;
+	application/vnd.realvnc.bed) echo "bed" ;;
+	application/vnd.recordare.musicxml) echo "mxl" ;;
+	application/vnd.recordare.musicxml+xml) echo "musicxml" ;;
+	application/vnd.rig.cryptonote) echo "cryptonote" ;;
+	application/vnd.rim.cod) echo "cod" ;;
+	application/vnd.rn-realmedia) echo "rm" ;;
+	application/vnd.route66.link66+xml) echo "link66" ;;
+	application/vnd.sailingtracker.track) echo "st" ;;
+	application/vnd.seemail) echo "see" ;;
+	application/vnd.sema) echo "sema" ;;
+	application/vnd.semd) echo "semd" ;;
+	application/vnd.semf) echo "semf" ;;
+	application/vnd.shana.informed.formdata) echo "ifm" ;;
+	application/vnd.shana.informed.formtemplate) echo "itp" ;;
+	application/vnd.shana.informed.interchange) echo "iif" ;;
+	application/vnd.shana.informed.package) echo "ipk" ;;
+	application/vnd.simtech-mindmapper) echo "twd" ;;
+	application/vnd.smaf) echo "mmf" ;;
+	application/vnd.smart.teacher) echo "teacher" ;;
+	application/vnd.solent.sdkm+xml) echo "sdkm" ;;
+	application/vnd.spotfire.dxp) echo "dxp" ;;
+	application/vnd.spotfire.sfs) echo "sfs" ;;
+	application/vnd.stardivision.calc) echo "sdc" ;;
+	application/vnd.stardivision.draw) echo "sda" ;;
+	application/vnd.stardivision.impress) echo "sdd" ;;
+	application/vnd.stardivision.math) echo "smf" ;;
+	application/vnd.stardivision.writer) echo "sdw" ;;
+	application/vnd.stardivision.writer-global) echo "sgl" ;;
+	application/vnd.stepmania.stepchart) echo "sm" ;;
+	application/vnd.sun.xml.calc) echo "sxc" ;;
+	application/vnd.sun.xml.calc.template) echo "stc" ;;
+	application/vnd.sun.xml.draw) echo "sxd" ;;
+	application/vnd.sun.xml.draw.template) echo "std" ;;
+	application/vnd.sun.xml.impress) echo "sxi" ;;
+	application/vnd.sun.xml.impress.template) echo "sti" ;;
+	application/vnd.sun.xml.math) echo "sxm" ;;
+	application/vnd.sun.xml.writer) echo "sxw" ;;
+	application/vnd.sun.xml.writer.global) echo "sxg" ;;
+	application/vnd.sun.xml.writer.template) echo "stw" ;;
+	application/vnd.sus-calendar) echo "sus" ;;
+	application/vnd.svd) echo "svd" ;;
+	application/vnd.symbian.install) echo "sis" ;;
+	application/vnd.syncml.dm+wbxml) echo "bdm" ;;
+	application/vnd.syncml.dm+xml) echo "xdm" ;;
+	application/vnd.syncml+xml) echo "xsm" ;;
+	application/vnd.tao.intent-module-archive) echo "tao" ;;
+	application/vnd.tmobile-livetv) echo "tmo" ;;
+	application/vnd.trid.tpt) echo "tpt" ;;
+	application/vnd.triscape.mxs) echo "mxs" ;;
+	application/vnd.trueapp) echo "tra" ;;
+	application/vnd.ufdl) echo "ufd" ;;
+	application/vnd.uiq.theme) echo "utz" ;;
+	application/vnd.umajin) echo "umj" ;;
+	application/vnd.unity) echo "unityweb" ;;
+	application/vnd.uoml+xml) echo "uoml" ;;
+	application/vnd.vcx) echo "vcx" ;;
+	application/vnd.visio2013) echo "vsdx" ;;
+	application/vnd.visio) echo "vsd" ;;
+	application/vnd.visionary) echo "vis" ;;
+	application/vnd.vsf) echo "vsf" ;;
+	application/vnd.wap.wbxml) echo "wbxml" ;;
+	application/vnd.wap.wmlc) echo "wmlc" ;;
+	application/vnd.wap.wmlscriptc) echo "wmlsc" ;;
+	application/vnd.webturbo) echo "wtb" ;;
+	application/vnd.wolfram.player) echo "nbp" ;;
+	application/vnd.wordperfect) echo "wpd" ;;
+	application/vnd.wqd) echo "wqd" ;;
+	application/vnd.wt.stf) echo "stf" ;;
+	application/vnd.xara) echo "xar" ;;
+	application/vnd.xfdl) echo "xfdl" ;;
+	application/vnd.yamaha.hv-dic) echo "hvd" ;;
+	application/vnd.yamaha.hv-script) echo "hvs" ;;
+	application/vnd.yamaha.hv-voice) echo "hvp" ;;
+	application/vnd.yamaha.openscoreformat) echo "osf" ;;
+	application/vnd.yamaha.openscoreformat.osfpvg+xml) echo "osfpvg" ;;
+	application/vnd.yamaha.smaf-audio) echo "saf" ;;
+	application/vnd.yamaha.smaf-phrase) echo "spf" ;;
+	application/vnd.yellowriver-custom-menu) echo "cmp" ;;
+	application/vnd.zul) echo "zir" ;;
+	application/vnd.zzazz.deck+xml) echo "zaz" ;;
+	application/voicexml+xml) echo "vxml" ;;
+	application/widget) echo "wgt" ;;
+	application/winhlp) echo "hlp" ;;
+	application/wsdl+xml) echo "wsdl" ;;
+	application/wspolicy+xml) echo "wspolicy" ;;
+	application/x-7z) echo "7z" ;;
+	application/x-7z-compressed) echo "7z" ;;
+	application/x-abiword) echo "abw" ;;
+	application/x-ace-compressed) echo "ace" ;;
+	application/x-apple-diskimage) echo "dmg" ;;
+	application/x-arj) echo "arj" ;;
+	application/x-authorware-bin) echo "aab" ;;
+	application/x-authorware-map) echo "aam" ;;
+	application/x-authorware-seg) echo "aas" ;;
+	application/x-bcpio) echo "bcpio" ;;
+	application/x-bittorrent) echo "torrent" ;;
+	application/x-bzip2) echo "bz2" ;;
+	application/x-bzip) echo "bz" ;;
+	application/xcap-diff+xml) echo "xdf" ;;
+	application/x-cdlink) echo "vcd" ;;
+	application/x-chat) echo "chat" ;;
+	application/x-chess-pgn) echo "pgn" ;;
+	application/x-cpio) echo "cpio" ;;
+	application/x-csh) echo "csh" ;;
+	application/x-debian-package) echo "deb" ;;
+	application/x-director) echo "dir" ;;
+	application/x-doom) echo "wad" ;;
+	application/x-dtbncx+xml) echo "ncx" ;;
+	application/x-dtbook+xml) echo "dtb" ;;
+	application/x-dtbresource+xml) echo "res" ;;
+	application/x-dvi) echo "dvi" ;;
+	application/xenc+xml) echo "xenc" ;;
+	application/x-font-bdf) echo "bdf" ;;
+	application/x-font-ghostscript) echo "gsf" ;;
+	application/x-font-linux-psf) echo "psf" ;;
+	application/x-font-otf) echo "otf" ;;
+	application/x-font-pcf) echo "pcf" ;;
+	application/x-font-snf) echo "snf" ;;
+	application/x-font-ttf) echo "ttf" ;;
+	application/x-font-type1) echo "pfa" ;;
+	application/x-font-woff) echo "woff" ;;
+	application/x-futuresplash) echo "spl" ;;
+	application/x-gnumeric) echo "gnumeric" ;;
+	application/x-gtar) echo "gtar" ;;
+	application/x-hdf) echo "hdf" ;;
+	application/xhtml+xml) echo "xhtml" ;;
+	application/x-java-jnlp-file) echo "jnlp" ;;
+	application/x-latex) echo "latex" ;;
+	application/x-lzip) echo "lz" ;;
+	application/xml-dtd) echo "dtd" ;;
+	application/xml) echo "xml" ;;
+	application/x-mobipocket-ebook) echo "prc" ;;
+	application/x-msaccess) echo "mdb" ;;
+	application/x-ms-application) echo "application" ;;
+	application/x-msbinder) echo "obd" ;;
+	application/x-mscardfile) echo "crd" ;;
+	application/x-msclip) echo "clp" ;;
+	application/x-msdownload) echo "exe" ;;
+	application/x-msmediaview) echo "mvb" ;;
+	application/x-msmetafile) echo "wmf" ;;
+	application/x-msmoney) echo "mny" ;;
+	application/x-mspublisher) echo "pub" ;;
+	application/x-msschedule) echo "scd" ;;
+	application/x-msterminal) echo "trm" ;;
+	application/x-ms-wmd) echo "wmd" ;;
+	application/x-ms-wmz) echo "wmz" ;;
+	application/x-mswrite) echo "wri" ;;
+	application/x-ms-xbap) echo "xbap" ;;
+	application/x-netcdf) echo "nc" ;;
+	application/xop+xml) echo "xop" ;;
+	application/x-pkcs12) echo "p12" ;;
+	application/x-pkcs7-certificates) echo "p7b" ;;
+	application/x-pkcs7-certreqresp) echo "p7r" ;;
+	application/x-rar-compressed) echo "rar" ;;
+	application/x-rar) echo "rar" ;;
+	application/x-shar) echo "shar" ;;
+	application/x-sh) echo "sh" ;;
+	application/x-shockwave-flash) echo "swf" ;;
+	application/x-silverlight-app) echo "xap" ;;
+	application/xslt+xml) echo "xslt" ;;
+	application/xspf+xml) echo "xspf" ;;
+	application/x-stuffit) echo "sit" ;;
+	application/x-stuffitx) echo "sitx" ;;
+	application/x-sv4cpio) echo "sv4cpio" ;;
+	application/x-sv4crc) echo "sv4crc" ;;
+	application/x-tar) echo "tar" ;;
+	application/x-tcl) echo "tcl" ;;
+	application/x-tex) echo "tex" ;;
+	application/x-texinfo) echo "texinfo" ;;
+	application/x-tex-tfm) echo "tfm" ;;
+	application/x-ustar) echo "ustar" ;;
+	application/xv+xml) echo "mxml" ;;
+	application/x-wais-source) echo "src" ;;
+	application/x-x509-ca-cert) echo "der" ;;
+	application/x-xfig) echo "fig" ;;
+	application/x-xpinstall) echo "xpi" ;;
+	application/x-xz) echo "xz" ;;
+	application/x-zstd) echo "zst" ;;
+	application/yang) echo "yang" ;;
+	application/yin+xml) echo "yin" ;;
+	application/zip) echo "zip" ;;
+	audio/adpcm) echo "adp" ;;
+	audio/basic) echo "au" ;;
+	audio/midi) echo "mid" ;;
+	audio/mp4) echo "mp4a" ;;
+	audio/mpeg) echo "mpga" ;;
+	audio/ogg) echo "oga" ;;
+	audio/vnd.dece.audio) echo "uva" ;;
+	audio/vnd.digital-winds) echo "eol" ;;
+	audio/vnd.dra) echo "dra" ;;
+	audio/vnd.dts) echo "dts" ;;
+	audio/vnd.dts.hd) echo "dtshd" ;;
+	audio/vnd.lucent.voice) echo "lvp" ;;
+	audio/vnd.ms-playready.media.pya) echo "pya" ;;
+	audio/vnd.nuera.ecelp4800) echo "ecelp4800" ;;
+	audio/vnd.nuera.ecelp7470) echo "ecelp7470" ;;
+	audio/vnd.nuera.ecelp9600) echo "ecelp9600" ;;
+	audio/vnd.rip) echo "rip" ;;
+	audio/webm) echo "weba" ;;
+	audio/x-aac) echo "aac" ;;
+	audio/x-aiff) echo "aif" ;;
+	audio/x-mpegurl) echo "m3u" ;;
+	audio/x-ms-wax) echo "wax" ;;
+	audio/x-ms-wma) echo "wma" ;;
+	audio/x-pn-realaudio) echo "ram" ;;
+	audio/x-pn-realaudio-plugin) echo "rmp" ;;
+	audio/x-wav) echo "wav" ;;
+	chemical/x-cdx) echo "cdx" ;;
+	chemical/x-cif) echo "cif" ;;
+	chemical/x-cmdf) echo "cmdf" ;;
+	chemical/x-cml) echo "cml" ;;
+	chemical/x-csml) echo "csml" ;;
+	chemical/x-xyz) echo "xyz" ;;
+	image/bmp) echo "bmp" ;;
+	image/cgm) echo "cgm" ;;
+	image/g3fax) echo "g3" ;;
+	image/gif) echo "gif" ;;
+	image/ief) echo "ief" ;;
+	image/jpeg) echo "jpg" ;;
+	image/ktx) echo "ktx" ;;
+	image/pjpeg) echo "pjpeg" ;;
+	image/png) echo "png" ;;
+	image/prs.btif) echo "btif" ;;
+	image/svg+xml) echo "svg" ;;
+	image/tiff) echo "tiff" ;;
+	image/vnd.adobe.photoshop) echo "psd" ;;
+	image/vnd.dece.graphic) echo "uvi" ;;
+	image/vnd.djvu) echo "djvu" ;;
+	image/vnd.dvb.subtitle) echo "sub" ;;
+	image/vnd.dwg) echo "dwg" ;;
+	image/vnd.dxf) echo "dxf" ;;
+	image/vnd.fastbidsheet) echo "fbs" ;;
+	image/vnd.fpx) echo "fpx" ;;
+	image/vnd.fst) echo "fst" ;;
+	image/vnd.fujixerox.edmics-mmr) echo "mmr" ;;
+	image/vnd.fujixerox.edmics-rlc) echo "rlc" ;;
+	image/vnd.ms-modi) echo "mdi" ;;
+	image/vnd.net-fpx) echo "npx" ;;
+	image/vnd.wap.wbmp) echo "wbmp" ;;
+	image/vnd.xiff) echo "xif" ;;
+	image/webp) echo "webp" ;;
+	image/x-citrix-jpeg) echo "jpg" ;;
+	image/x-citrix-png) echo "png" ;;
+	image/x-cmu-raster) echo "ras" ;;
+	image/x-cmx) echo "cmx" ;;
+	image/x-freehand) echo "fh" ;;
+	image/x-icon) echo "ico" ;;
+	image/x-pcx) echo "pcx" ;;
+	image/x-pict) echo "pic" ;;
+	image/x-png) echo "png" ;;
+	image/x-portable-anymap) echo "pnm" ;;
+	image/x-portable-bitmap) echo "pbm" ;;
+	image/x-portable-graymap) echo "pgm" ;;
+	image/x-portable-pixmap) echo "ppm" ;;
+	image/x-rgb) echo "rgb" ;;
+	image/x-xbitmap) echo "xbm" ;;
+	image/x-xpixmap) echo "xpm" ;;
+	image/x-xwindowdump) echo "xwd" ;;
+	message/rfc822) echo "eml" ;;
+	model/iges) echo "igs" ;;
+	model/mesh) echo "msh" ;;
+	model/vnd.collada+xml) echo "dae" ;;
+	model/vnd.dwf) echo "dwf" ;;
+	model/vnd.gdl) echo "gdl" ;;
+	model/vnd.gtw) echo "gtw" ;;
+	model/vnd.mts) echo "mts" ;;
+	model/vnd.vtu) echo "vtu" ;;
+	model/vrml) echo "wrl" ;;
+	text/calendar) echo "ics" ;;
+	text/css) echo "css" ;;
+	text/csv) echo "csv" ;;
+	text/html) echo "html" ;;
+	text/n3) echo "n3" ;;
+	text/plain-bas) echo "par" ;;
+	text/plain) echo "txt" ;;
+	text/prs.lines.tag) echo "dsc" ;;
+	text/richtext) echo "rtx" ;;
+	text/sgml) echo "sgml" ;;
+	text/tab-separated-values) echo "tsv" ;;
+	text/troff) echo "t" ;;
+	text/turtle) echo "ttl" ;;
+	text/uri-list) echo "uri" ;;
+	text/vnd.curl.dcurl) echo "dcurl" ;;
+	text/vnd.curl) echo "curl" ;;
+	text/vnd.curl.mcurl) echo "mcurl" ;;
+	text/vnd.curl.scurl) echo "scurl" ;;
+	text/vnd.fly) echo "fly" ;;
+	text/vnd.fmi.flexstor) echo "flx" ;;
+	text/vnd.graphviz) echo "gv" ;;
+	text/vnd.in3d.3dml) echo "3dml" ;;
+	text/vnd.in3d.spot) echo "spot" ;;
+	text/vnd.sun.j2me.app-descriptor) echo "jad" ;;
+	text/vnd.wap.wml) echo "wml" ;;
+	text/vnd.wap.wmlscript) echo "wmls" ;;
+	text/x-asm) echo "s" ;;
+	text/x-awk) echo "awk" ;;
+	text/x-c) echo "c" ;;
+	text/x-fortran) echo "f" ;;
+	text/x-java) echo "java" ;;
+	text/x-java-source) echo "java" ;;
+	text/x-pascal) echo "p" ;;
+	text/x-setext) echo "etx" ;;
+	text/x-uuencode) echo "uu" ;;
+	text/x-vcalendar) echo "vcs" ;;
+	text/x-vcard) echo "vcf" ;;
+	text/x-shellscript) echo "sh" ;;
+	text/yaml) echo "yaml" ;;
+	video/3gpp2) echo "3g2" ;;
+	video/3gpp) echo "3gp" ;;
+	video/h261) echo "h261" ;;
+	video/h263) echo "h263" ;;
+	video/h264) echo "h264" ;;
+	video/jpeg) echo "jpgv" ;;
+	video/jpm) echo "jpm" ;;
+	video/mj2) echo "mj2" ;;
+	video/mp4) echo "mp4" ;;
+	video/mpeg) echo "mpeg" ;;
+	video/ogg) echo "ogv" ;;
+	video/quicktime) echo "qt" ;;
+	video/vnd.dece.hd) echo "uvh" ;;
+	video/vnd.dece.mobile) echo "uvm" ;;
+	video/vnd.dece.pd) echo "uvp" ;;
+	video/vnd.dece.sd) echo "uvs" ;;
+	video/vnd.dece.video) echo "uvv" ;;
+	video/vnd.fvt) echo "fvt" ;;
+	video/vnd.mpegurl) echo "mxu" ;;
+	video/vnd.ms-playready.media.pyv) echo "pyv" ;;
+	video/vnd.uvvu.mp4) echo "uvu" ;;
+	video/vnd.vivo) echo "viv" ;;
+	video/webm) echo "webm" ;;
+	video/x-f4v) echo "f4v" ;;
+	video/x-fli) echo "fli" ;;
+	video/x-flv) echo "flv" ;;
+	video/x-m4v) echo "m4v" ;;
+	video/x-ms-asf) echo "asf" ;;
+	video/x-msvideo) echo "avi" ;;
+	video/x-ms-wm) echo "wm" ;;
+	video/x-ms-wmv) echo "wmv" ;;
+	video/x-ms-wmx) echo "wmx" ;;
+	video/x-ms-wvx) echo "wvx" ;;
+	video/x-sgi-movie) echo "movie" ;;
+	x-conference/x-cooltalk) echo "ice" ;;
+	*)
+		echo $mimetype
+	esac
+}
+
+function cat_tar() {
+	[ ! $(command -v tar) ] && return 1
+
+	FLAG=$1
+
+	if [[ $(tar ${FLAG} -tf "$INPUT" | wc -l) = 1 ]] || [[ "$FORCE" = 1 ]]; then
+		tar ${FLAG} -xOf "$INPUT"
+	else
+		tar ${FLAG} -tf "$INPUT"
+	fi
+}
+
+function cat_7z() {
+	[ ! $(command -v 7z) ] && return 1
+
+	if [[ $(7z l -p- -ba "$INPUT" | wc -l) = 1 ]] || [[ "$FORCE" = 1 ]]; then
+		7z e -p- -so "$INPUT" 2> /dev/null
+	else
+		7z l -p- "$INPUT"
+	fi
+}
+
+function cat_zip() {
+	[ ! $(command -v unzip) ] && return 1
+
+	if [[ $(unzip -qq -l "$INPUT" | wc -l) = 1 ]] || [[ "$FORCE" = 1 ]]; then
+		unzip -p "$INPUT"
+	else
+		unzip -l "$INPUT"
+	fi
+}
+
+function cat_rar() {
+	[ ! $(command -v unrar) ] && return 1
+
+	if [[ $(unrar -p- lb "$INPUT" | wc -l) = 1 ]] || [[ "$FORCE" = 1 ]]; then
+		unrar p -p- "$INPUT"
+	else
+		unrar l -p- "$INPUT"
+	fi
+}
+
+function cat_arj() {
+	[ ! $(command -v arj) ] && return 1
+
+	if [[ "$FORCE" = 1 ]]; then
+		arj p -g "$INPUT"
+	else
+		arj l -g "$INPUT"
+	fi
+}
+
+function cat_sourcecode() {
+	[ ! $(command -v source-highlight) ] && return 1
+
+	local src
+	src=$(source-highlight --lang-list | grep -E "^${extension} = ")
+	source-highlight --out-format=esc -o STDOUT -i "$INPUT" -s ${src:-txt}
+}
+
+function cat_pdftotext() {
+	[ ! $(command -v pdftotext) ] && return 1
+
+	pdftotext -- "$INPUT" -
+}
+
+function cat_unoconv() {
+	[ ! $(command -v unoconv) ] && return 1
+
+	# check unoconv documentation for other document and spreadsheet file types
+	unoconv --stdout --format=txt "$INPUT"
+}
+
+function cat_exiftool() {
+	[ ! $(command -v exiftool) ] && return 1
+
+	exiftool "$INPUT"
+}
+
+function cat_metaflac() {
+	[ ! $(command -v metaflac) ] && return 1
+
+	metaflac --except-block-type="PICTURE" --list "$INPUT"
+}
+
+function cat_jp2a() {
+	[ ! $(command -v jp2a) ] && return 1
+
+	if [[ "$FORCE" = 1 ]]; then
+		jp2a --invert --colors --fill --width="$(tput cols)" "$INPUT"
+	else
+		jp2a --invert --colors --width="$(tput cols)" "$INPUT"
+	fi
+}
+
+function cat_convert_jp2a() {
+	[ ! $(command -v convert) ] && return 1
+	[ ! $(command -v jp2a) ] && return 1
+
+	convert "$INPUT" jpg:- | jp2a --invert --colors --width="$(tput cols)" -
+}
+
+function cat_unoconv_jp2a() {
+	[ ! $(command -v unoconv) ] && return 1
+	[ ! $(command -v jp2a) ] && return 1
+
+	unoconv --stdout --format=jpg "$INPUT" | jp2a --invert --colors --width="$(tput cols)" -
+}
+
+
+if [[ $# == 0 ]]; then
+	set -- '-h'
+fi
+
+# Initial parse of command line arguments
+while (( $# )); do
+	case "$1" in
+	-f|--force)
+		shift
+		FORCE=1
+		;;
+	--mime)
+		shift
+		ECHOMIMEONLY=1
+		;;
+	-h|--help)
+		shift
+		args_format="  %-31s%s\n"
+		
+		printf "%s\n\n" "Usage: xcat [FILE]..."
+		printf "%s\n\n" "Extended cat utility that chooses an appropriate command line tool based on the file extension to concatenate and print file content to the standard output."
+		printf "%s\n" "This script may refer to the following command line tools:"
+		printf "    %s\n" "cat (default), zcat, bzcat, lzip, pdftotext, 7z, arj, tar, exiftool, unoconv, ufraw-batch,"
+		printf "    %s\n" "convert (imagemagick), jp2a, metaflac, lsd, source-highlight"
+		printf "\n%s\n" "Some of the above may need to be installed, try:"
+		printf "    %s\n\n" "sudo apt-get install odt2txt"
+		echo
+	exit
+		exit
+		;;
+	*) # all other parameters
+		PARAMS[${#PARAMS[*]}]=${1}
+		shift
+		;;
+	esac
+done
+
+set -- "${PARAMS[@]}"
+
+for INPUT in "$@"
+do
+	if [ ! -e "$INPUT" ]; then
+		echo "File $INPUT does not exist"
+		continue
+	fi
+
+	extension=
+	if [[ -f "$INPUT" ]] && [[ "$INPUT" =~ \. ]]; then
+		extension=${INPUT##*.}
+		extension=${extension,,}
+		if [[ "${INPUT,,}" =~ \.(tar)\. ]]; then
+			extension=tar.${extension}
+		fi
+	fi
+	if [[ -z "$extension" ]]; then
+		extension=$(deduce_extension_from_mimetype $INPUT)
+	fi
+
+	mimetype=$(file -b --mime-type -- "$INPUT")
+
+	[ $(command -v "subla") ] && case $extension in
+	txt)
+		echo "subl $INPUT"
+		continue
+	esac
+
+	if [[ "$ECHOMIMEONLY" = 1 ]]; then
+		echo "${mimetype} ($INPUT)"
+		continue
+	fi
+
+	case $extension in
+	### Archives ###
+	tgz|tar.gz) cat_tar -z ;;
+	tar.bz2)    cat_tar -j ;;
+	tar.xz)     cat_tar -J ;;
+	tar.lz)     cat_tar --lzip ;;
+	tar)        cat_tar ;;
+	bz|bz2)     cat_7z || [ $(command -v bzcat) ] && bzcat "$INPUT" ;;
+	gz)         cat_7z || [ $(command -v zcat) ] && zcat "$INPUT" ;;
+	xz)         cat_7z || [ $(command -v xzcat) ] && xzcat "$INPUT" ;;
+	arj)        cat_7z || cat_arj ;;
+	rar)        cat_7z || cat_rar ;;
+	zst)        [ $(command -v zstdcat) ] && zstdcat "$INPUT" ;;
+	7z|cab|cpio|rpm|iso|deb|pptm)
+		cat_7z ;;
+	jar|zip)
+		cat_zip ;;
+	lz)
+		[ $(command -v lzip) ] && lzip -d -c "$INPUT" ;;
+	### Scripts ###
+	c|f77|f90|h|ac|ada|adb|am|applescript|asm|autoconf|awk|bash|bat|batch) ;&
+	bib|bison|c|caml|cbl|cc|changelog|clipper|cls|cobol|coffee|coffeescript) ;&
+	conf|cpp|cs|csh|csharp|css|ctp|cxx|d|desktop|diff|dmd|docbook|dtx|el|eps) ;&
+	erl|erlang|errors|f|f77|f90|feature|fixed-fortran|flex|fortran|free-fortran) ;&
+	glsl|go|groovy|h|haskell|haxe|hh|hpp|hs|htm|html|hx|hxx|in|ini|islisp|java) ;&
+	javalog|javascript|js|json|kcfg|kdevelop|kidl|ksh|l|lang|langdef|latex|ldap) ;&
+	ldif|lex|lgt|lhs|lilypond|lisp|ll|log|logtalk|lsm|lua|ly|m4|makefile|manifest) ;&
+	mf|ml|mli|moc|opa|outlang|oz|p|pas|pascal|patch|pc|perl|php|php3|php4|php5) ;&
+	pkgconfig|pl|pm|po|postscript|pot|prg|prolog|properties|proto|protobuf|ps) ;&
+	py|python|r|rb|rc|ruby|s|scala|scheme|scm|scpt|sh|shell|sig|sl|slang|slsh) ;&
+	sml|spec|sql|sty|style|syslog|tcl|tcsh|tex|texi|texinfo|tk|tml|ui|upc) ;&
+	vala|vbs|vbscript|xhtml|xml|xorg|y|yacc|yy|zsh|apj|ssl|xml)
+		cat_sourcecode ;;
+	txt)
+		cat -- "$INPUT" ;;
+	### Documents ###
+	pdf)
+		cat_pdftotext || cat_unoconv ;;
+	bib|doc|xml|docx|fodt|html|ltx|txt|odt|xml|ott|pdb|psw|rtf|sdw|stw|sxw|uot|vor|wps)
+		cat_unoconv ;;
+	### Spreadsheets ###
+	csv|dbf|dif|fods|html|ods|xml|ots|pdf|pxl|sdc|slk|stc|sxc|uos|vor|xhtml|xls|xlt|xlsx)
+		cat_unoconv ;;
+	### Presentation formats ###
+	emf|eps|fodp|html|met|odg|odp|otp|pbm|pct|pdf|pgm|potm|pot) ;&
+	ppm|pptx|pps|ppt|pwp|ras|sda|sdd|sxd|sti|svg|svm|swf|sxi|uop) ;&
+	vor|vor|vor|vor|wmf|xml|xpm)
+		cat_unoconv_jp2a ;;
+	### Images ###
+	jpg|jpeg)
+		cat_exiftool; cat_jp2a ;;
+	bmp|emf|eps|fodg|html|met|odd|otg|pbm|pct|pdf|pgm|png|ppm|ras|std) ;&
+	svg|svm|swf|sxd|sxw|tiff|vor|wmf|xhtml|xpm)
+		cat_unoconv_jp2a ;;
+	png|bmp|gif|tiff|nef)
+		cat_exiftool; cat_convert_jp2a || cat_unoconv_jp2a;;
+	nef|3fr|3g2|3gp|acr|afm|ai|aiff|ape|arw|asf|btf|chm|cos|cr2) ;&
+	crw|cs1|dcm|dcp|dcr|dfont|divx|djvu|dll|dng|dv|dvb|dylib|eip|eps|erf|exe) ;&
+	exif|exr|f4a|f4v|fff|fpx|hdp|hdr|icc|idml|iiq|ind|inx|itc|j2c|jng) ;&
+	jp2|k25|kdc|key|la|m2ts|lnk|m4a|m4v|mef|mie|miff|mka|mks|mng|mos) ;&
+	mpc|mpo|mqv|mrw|mxf|nrw|numbers|odp|ofr|ogv|orf|otf|pac) ;&
+	pages|pbm|pcd|pef|pfa|pfb|pfm|pgf|pgm|pict|pmp|ppm|ppt|pptx|ps|psb|psd) ;&
+	psp|qtif|ra|raf|ram|raw|riff|rsrc|rtf|rw2|rwl|rwz|rm|so|sr2|srf|srw|svg) ;&
+	swf|thm|ttc|ttf|vrd|vsd|wdp|webp|webm|wma|wmv|wv|x3f|xcf|xlsx|xmp)
+		cat_exiftool ;;
+	avi|flv|mov|mkv|mp4|mpg|mpeg)
+	### Video ###
+		cat_exiftool ;;
+	### Audio ###
+	flac)
+		cat_metaflac || cat_exiftool ;;
+	mp3|fla|ogg|wav)
+		cat_exiftool ;;
+	*)
+		case $mimetype in 
+		text/plain)
+			cat "$INPUT" ;;
+		inode/directory)
+			[ $(command -v lsd) ] && lsd -l "$INPUT" || ls -l --color "$INPUT" ;;
+		application/x-executable)
+			file -b "$INPUT" ;;
+		*)
+			file -b "$INPUT"
+			echo "${mimetype} ($INPUT)"
+		esac
+	esac
+
+	if [[ $? != 0 ]]; then
+		file -b "$INPUT"
+		echo "${mimetype} ($INPUT) (extension = $extension)"
+	fi
+done
+
+IFS=$IFSBAK
