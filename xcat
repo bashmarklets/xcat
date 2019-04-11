@@ -9,13 +9,14 @@ function deduce_extension_from_mimetype() {
 	local mimetype=$(file -b --mime-type -- "$1")
 
 	case $mimetype in
-	inode/directory) echo $mimetype ;;
-	application/andrew-inset) echo "N/A" ;;
+	application/andrew-inset) echo "$mimetype" ;;
 	application/applixware) echo "aw" ;;
 	application/atomcat+xml) echo "atomcat" ;;
 	application/atomsvc+xml) echo "atomsvc" ;;
 	application/atom+xml) echo "xml" ;;
 	application/ccxml+xml) echo "ccxml" ;;
+	application/CDFV2) echo "db" ;; # typically Thumbs.db
+	application/CDFV2-unknown) echo  "fla" ;; # can also be .doc, .msg, .sdv
 	application/cdmi-capability) echo "cdmia" ;;
 	application/cdmi-container) echo "cdmic" ;;
 	application/cdmi-domain) echo "cdmid" ;;
@@ -61,6 +62,7 @@ function deduce_extension_from_mimetype() {
 	application/onenote) echo "onetoc" ;;
 	application/patch-ops-error+xml) echo "xer" ;;
 	application/pdf) echo "pdf" ;;
+	application/pgp-keys) echo "pgp" ;;
 	application/pgp-encrypted) echo "pgp" ;;
 	application/pgp-signature) echo "pgp" ;;
 	application/pics-rules) echo "prf" ;;
@@ -300,6 +302,7 @@ function deduce_extension_from_mimetype() {
 	application/vnd.ms-ims) echo "ims" ;;
 	application/vnd.ms-lrm) echo "lrm" ;;
 	application/vnd.ms-officetheme) echo "thmx" ;;
+	application/vnd.ms-opentype) echo "otf" ;;
 	application/vnd.ms-pki.seccat) echo "cat" ;;
 	application/vnd.ms-pki.stl) echo "stl" ;;
 	application/vnd.ms-powerpoint.addin.macroenabled.12) echo "ppam" ;;
@@ -460,6 +463,7 @@ function deduce_extension_from_mimetype() {
 	application/x-abiword) echo "abw" ;;
 	application/x-ace-compressed) echo "ace" ;;
 	application/x-apple-diskimage) echo "dmg" ;;
+	application/x-archive) echo "a" ;;
 	application/x-arj) echo "arj" ;;
 	application/x-authorware-bin) echo "aab" ;;
 	application/x-authorware-map) echo "aam" ;;
@@ -472,15 +476,25 @@ function deduce_extension_from_mimetype() {
 	application/x-cdlink) echo "vcd" ;;
 	application/x-chat) echo "chat" ;;
 	application/x-chess-pgn) echo "pgn" ;;
+	application/x-coredump) echo "$mimetype" ;;
 	application/x-cpio) echo "cpio" ;;
 	application/x-csh) echo "csh" ;;
+	application/x-dbf) echo "dbf" ;;
 	application/x-debian-package) echo "deb" ;;
 	application/x-director) echo "dir" ;;
 	application/x-doom) echo "wad" ;;
+	application/x-dosexec)
+		# Can be
+		#   .118, .180, .192, .195, .197, .acm, .acv, .asi, .com, .cpl, .dat, .dll, .dll16,
+		#   .drv, .drv16, .ds, .efi, .exe, .exe16, .flt, .fon, .icl, .jam, .mix, .mod, .mod16,
+		#   .mpd, .new, .ocx, .pif, .pyd, .scr, .sfx, .signed, .stub, .tlb, .ub, .vxd
+		echo "dll" ;; # (most common)
 	application/x-dtbncx+xml) echo "ncx" ;;
 	application/x-dtbook+xml) echo "dtb" ;;
 	application/x-dtbresource+xml) echo "res" ;;
 	application/x-dvi) echo "dvi" ;;
+	application/x-elc) echo "sml" ;; # can also be .out
+	application/x-empty) echo "$mimetype" ;; # empty file
 	application/xenc+xml) echo "xenc" ;;
 	application/x-font-bdf) echo "bdf" ;;
 	application/x-font-ghostscript) echo "gsf" ;;
@@ -491,16 +505,26 @@ function deduce_extension_from_mimetype() {
 	application/x-font-ttf) echo "ttf" ;;
 	application/x-font-type1) echo "pfa" ;;
 	application/x-font-woff) echo "woff" ;;
+	application/x-freemind) echo "mm" ;;
 	application/x-futuresplash) echo "spl" ;;
+	application/x-gdbm) echo "db" ;;
 	application/x-gnumeric) echo "gnumeric" ;;
+	application/x-gnupg-keyring) echo "gpg" ;;
 	application/x-gtar) echo "gtar" ;;
 	application/x-hdf) echo "hdf" ;;
 	application/xhtml+xml) echo "xhtml" ;;
+	application/x-iso9660-image) echo "iso" ;;
+	application/x-java-applet) echo "class" ;;
 	application/x-java-jnlp-file) echo "jnlp" ;;
+	application/x-java-keystore) echo "$mimetype" ;; # cacerts
+	application/x-kdelnk) echo "desktop" ;;
 	application/x-latex) echo "latex" ;;
+	application/x-lz4) echo "lz4" ;;
 	application/x-lzip) echo "lz" ;;
+	application/x-lzma) echo "img" ;;
 	application/xml-dtd) echo "dtd" ;;
 	application/xml) echo "xml" ;;
+	application/x-mach-binary) echo "so" ;; # also .dylib and .dat
 	application/x-mobipocket-ebook) echo "prc" ;;
 	application/x-msaccess) echo "mdb" ;;
 	application/x-ms-application) echo "application" ;;
@@ -508,6 +532,7 @@ function deduce_extension_from_mimetype() {
 	application/x-mscardfile) echo "crd" ;;
 	application/x-msclip) echo "clp" ;;
 	application/x-msdownload) echo "exe" ;;
+	application/x-msi) echo "msi" ;;
 	application/x-msmediaview) echo "mvb" ;;
 	application/x-msmetafile) echo "wmf" ;;
 	application/x-msmoney) echo "mny" ;;
@@ -519,17 +544,28 @@ function deduce_extension_from_mimetype() {
 	application/x-mswrite) echo "wri" ;;
 	application/x-ms-xbap) echo "xbap" ;;
 	application/x-netcdf) echo "nc" ;;
+	application/x-object) echo "ko" ;; # can also be .mod, .o, .nffw, .a, .r0, .rc, .ro
 	application/xop+xml) echo "xop" ;;
+	application/x-pgp-keyring) echo "lbx" ;;
 	application/x-pkcs12) echo "p12" ;;
 	application/x-pkcs7-certificates) echo "p7b" ;;
 	application/x-pkcs7-certreqresp) echo "p7r" ;;
 	application/x-rar-compressed) echo "rar" ;;
 	application/x-rar) echo "rar" ;;
+	application/x-setupscript) echo "inf" ;; # can also be .ini
 	application/x-shar) echo "shar" ;;
+	application/x-sharedlib)
+		# Can be
+		#   .<digits>, .basic, .bfd, .bfs, .bin, .c32, .cgi, .cifs, .cramfs, .cups, .debug,
+		#   .distrib, .e32, .e64, .fat, .fsutils, .fuse, .idmap, .mailutils, .minix, .node,
+		#   .preinst, .probe, .procps, .real, .secaudit, .so, .tiny, .udisks2, .ul, .upcall,
+		#   .usermap, .wrap
+		echo "so" ;; # (most common)
 	application/x-sh) echo "sh" ;;
 	application/x-shockwave-flash) echo "swf" ;;
 	application/x-silverlight-app) echo "xap" ;;
 	application/xslt+xml) echo "xslt" ;;
+	application/x-snappy-framed) echo "$mimetype" ;;
 	application/xspf+xml) echo "xspf" ;;
 	application/x-stuffit) echo "sit" ;;
 	application/x-stuffitx) echo "sitx" ;;
@@ -543,14 +579,17 @@ function deduce_extension_from_mimetype() {
 	application/x-ustar) echo "ustar" ;;
 	application/xv+xml) echo "mxml" ;;
 	application/x-wais-source) echo "src" ;;
+	application/x-wine-extension-ini) echo "ini" ;;
 	application/x-x509-ca-cert) echo "der" ;;
 	application/x-xfig) echo "fig" ;;
 	application/x-xpinstall) echo "xpi" ;;
 	application/x-xz) echo "xz" ;;
+	application/x-zmachine) echo "pak" ;;
 	application/x-zstd) echo "zst" ;;
 	application/yang) echo "yang" ;;
 	application/yin+xml) echo "yin" ;;
 	application/zip) echo "zip" ;;
+	application/zlib) echo "ortho" ;; # can also be .json
 	audio/adpcm) echo "adp" ;;
 	audio/basic) echo "au" ;;
 	audio/midi) echo "mid" ;;
@@ -571,6 +610,9 @@ function deduce_extension_from_mimetype() {
 	audio/webm) echo "weba" ;;
 	audio/x-aac) echo "aac" ;;
 	audio/x-aiff) echo "aif" ;;
+	audio/x-flac) echo "flac" ;;
+	audio/x-mod) echo "xm" ;; # can also be .mod
+	audio/x-mp4a-latm) echo "$mimetype" ;;
 	audio/x-mpegurl) echo "m3u" ;;
 	audio/x-ms-wax) echo "wax" ;;
 	audio/x-ms-wma) echo "wma" ;;
@@ -588,6 +630,7 @@ function deduce_extension_from_mimetype() {
 	image/g3fax) echo "g3" ;;
 	image/gif) echo "gif" ;;
 	image/ief) echo "ief" ;;
+	image/jp2) echo "css" ;;
 	image/jpeg) echo "jpg" ;;
 	image/ktx) echo "ktx" ;;
 	image/pjpeg) echo "pjpeg" ;;
@@ -615,19 +658,32 @@ function deduce_extension_from_mimetype() {
 	image/x-citrix-png) echo "png" ;;
 	image/x-cmu-raster) echo "ras" ;;
 	image/x-cmx) echo "cmx" ;;
+	image/x-cur) echo "cur" ;;
 	image/x-freehand) echo "fh" ;;
 	image/x-icon) echo "ico" ;;
+	image/x-ms-bmp) echo "bmp" ;; # also seen .jpg, .ico, .sys, .gif, .org
 	image/x-pcx) echo "pcx" ;;
 	image/x-pict) echo "pic" ;;
 	image/x-png) echo "png" ;;
 	image/x-portable-anymap) echo "pnm" ;;
 	image/x-portable-bitmap) echo "pbm" ;;
 	image/x-portable-graymap) echo "pgm" ;;
+	image/x-portable-greymap) echo "pgm" ;; # also seen .map
 	image/x-portable-pixmap) echo "ppm" ;;
 	image/x-rgb) echo "rgb" ;;
 	image/x-xbitmap) echo "xbm" ;;
+	image/x-xcf) echo "xcf" ;;
 	image/x-xpixmap) echo "xpm" ;;
+	image/x-xpmi) echo "xpm" ;;
 	image/x-xwindowdump) echo "xwd" ;;
+	inode/blockdevice) echo "$mimetype" ;;
+	inode/chardevice) echo "$mimetype" ;;
+	inode/directory) echo "$mimetype" ;;
+	inode/fifo) echo "ref" ;; # also .pipe
+	inode/socket) echo "sock" ;; # also .socket, .progress
+	inode/symlink) echo "$mimetype" ;;
+	inode/x-empty) echo "$mimetype" ;; # empty file
+	message/news) echo "$mimetype" ;;
 	message/rfc822) echo "eml" ;;
 	model/iges) echo "igs" ;;
 	model/mesh) echo "msh" ;;
@@ -643,15 +699,18 @@ function deduce_extension_from_mimetype() {
 	text/csv) echo "csv" ;;
 	text/html) echo "html" ;;
 	text/n3) echo "n3" ;;
+	text/PGP) echo "fw" ;;
 	text/plain-bas) echo "par" ;;
 	text/plain) echo "txt" ;;
 	text/prs.lines.tag) echo "dsc" ;;
 	text/richtext) echo "rtx" ;;
+	text/rtf) echo "rtf" ;; # also seen .doc
 	text/sgml) echo "sgml" ;;
 	text/tab-separated-values) echo "tsv" ;;
 	text/troff) echo "t" ;;
 	text/turtle) echo "ttl" ;;
 	text/uri-list) echo "uri" ;;
+	text/vcard) echo "vcf" ;;
 	text/vnd.curl.dcurl) echo "dcurl" ;;
 	text/vnd.curl) echo "curl" ;;
 	text/vnd.curl.mcurl) echo "mcurl" ;;
@@ -667,11 +726,42 @@ function deduce_extension_from_mimetype() {
 	text/x-asm) echo "s" ;;
 	text/x-awk) echo "awk" ;;
 	text/x-c) echo "c" ;;
+	text/x-c++)
+		# Can be
+		#   .as, .bugs, .c, .cocci, .cpp, .ctb, .cti, .debian, .ftl, .h, .hpp, .html, .itcl, .jad
+		#   .java, .js, .md, .mm, .old, .pod, .py, . pyi, .rc, .template, .ts, .txt, .utb
+		echo "cpp" ;;
+	text/x-diff) echo "patch" ;; # can also be .diff, .debian, .txt, .alps, .robot
 	text/x-fortran) echo "f" ;;
 	text/x-java) echo "java" ;;
 	text/x-java-source) echo "java" ;;
+	text/x-lisp) echo "lsp" ;; # can also be .alisp, .am, .el, .js, .m4, .scm
+	text/x-m4) echo "m4" ;; # also seen .in
+	text/x-makefile)
+		# Can be
+		#   .aic79xx, .aic7xxx, .am, .asm, .build, .cfg, .cgfxcat, .cginfo, .conf, .config, .d,
+		#   .desc, .fallback, .footer, .fwinst, .gitignore, .glew, .glewinfo, .glewlib, .global,
+		#   .h, .in, .java, .js, .kasan, .l, .lang, .m2c, .m2i, .m2m, .m4, .mak, .md, .mk,
+		#   .modbuiltin, .perf, .port, .ps, .rules, .sample, .scm, .specs, .ssrl, .styles, .tcl,
+		#   .texi, .trace, .traceCg, .traceCgGL, .traceGL, .traceGLUT, .txt, .um, .utb, .vc,
+		#   .visualinfo
+		echo "$mimetype" ;; # typically Makefile 
+	text/x-msdos-batch) echo "bat" ;; # can also be .cmd
 	text/x-pascal) echo "p" ;;
+	text/x-php) echo "php" ;;
+	text/x-po) echo "po" ;; # can also be .pot
+	text/x-python)
+		# Can be
+		#   .cgi, .conf, .ctb, .fcgi, .md, .pod, .pyi, .pyj, .pyx, .rst, .sage, .test, .txt, .vim,
+		#   .wsgi, .zsh
+		echo "py" ;;
+	text/x-ruby) echo "rb" ;; # also seen .py, .txt, .vim
 	text/x-setext) echo "etx" ;;
+	text/x-tex)
+		# Can be
+		#   .amf, .det, .html, .js, .lang, .latex, .nanorc, .outlang, .page, .py, .qml, .sty, .tex,
+		#   .texi, .txt, .vim
+		echo "tex" ;; 
 	text/x-uuencode) echo "uu" ;;
 	text/x-vcalendar) echo "vcs" ;;
 	text/x-vcard) echo "vcf" ;;
@@ -701,9 +791,11 @@ function deduce_extension_from_mimetype() {
 	video/vnd.vivo) echo "viv" ;;
 	video/webm) echo "webm" ;;
 	video/x-f4v) echo "f4v" ;;
+	video/x-flc) echo "flc" ;;
 	video/x-fli) echo "fli" ;;
 	video/x-flv) echo "flv" ;;
 	video/x-m4v) echo "m4v" ;;
+	video/x-mng) echo "mng" ;;
 	video/x-ms-asf) echo "asf" ;;
 	video/x-msvideo) echo "avi" ;;
 	video/x-ms-wm) echo "wm" ;;
@@ -713,7 +805,7 @@ function deduce_extension_from_mimetype() {
 	video/x-sgi-movie) echo "movie" ;;
 	x-conference/x-cooltalk) echo "ice" ;;
 	*)
-		echo $mimetype
+		echo "$mimetype"
 	esac
 }
 
