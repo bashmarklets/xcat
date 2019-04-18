@@ -5,15 +5,22 @@ IFS=$(echo -en "\n\b")
 FORCE=0
 ECHOMIMEONLY=0
 #set -x
+
+# also see /etc/mime.types
 function deduce_extension_from_mimetype() {
 	local mimetype=$(file -b --mime-type -- "$1")
 
 	case $mimetype in
-	application/andrew-inset) echo "$mimetype" ;;
+	application/andrew-inset) echo "ez" ;;
+	application/annodex) echo "anx" ;;
 	application/applixware) echo "aw" ;;
 	application/atomcat+xml) echo "atomcat" ;;
+	application/atomdeleted+xml) echo "atomdeleted" ;;
 	application/atomsvc+xml) echo "atomsvc" ;;
 	application/atom+xml) echo "xml" ;;
+	application/auth-policy+xml) echo "apxml" ;;
+	application/calendar+xml) echo "xcs" ;;
+	application/ccmp+xml) echo "ccmp" ;;
 	application/ccxml+xml) echo "ccxml" ;;
 	application/CDFV2) echo "db" ;; # typically Thumbs.db
 	application/CDFV2-unknown) echo  "fla" ;; # can also be .doc, .msg, .sdv
@@ -22,23 +29,39 @@ function deduce_extension_from_mimetype() {
 	application/cdmi-domain) echo "cdmid" ;;
 	application/cdmi-object) echo "cdmio" ;;
 	application/cdmi-queue) echo "cdmiq" ;;
+	application/cellml+xml) echo "cellml" ;; # .cml
+	application/cpl+xml) echo "cpl" ;;
 	application/cu-seeme) echo "cu" ;;
+	application/dash+xml) echo "mpd" ;;
 	application/davmount+xml) echo "davmount" ;;
+	application/dicom) echo "dcm" ;;
+	application/dskpp+xml) echo "xmls" ;;
 	application/dssc+der) echo "dssc" ;;
 	application/dssc+xml) echo "xdssc" ;;
+	application/dvcs) echo "dvc" ;;
 	application/ecmascript) echo "es" ;;
 	application/emma+xml) echo "emma" ;;
 	application/epub+zip) echo "epub" ;;
 	application/exi) echo "exi" ;;
+	application/fastinfoset) echo "finf" ;;
+	application/fdt+xml) echo "fdt" ;;
+	application/font-sfnt) echo "ttf" ;;
 	application/font-tdpfr) echo "pfr" ;;
+	application/font-woff) echo "woff" ;;
 	application/gzip) echo "gz" ;;
 	application/hyperstudio) echo "stk" ;;
+	application/inkml+xml) echo "ink" ;; # .inkml
 	application/ipfix) echo "ipfix" ;;
 	application/java-archive) echo "jar" ;;
 	application/javascript) echo "js" ;;
 	application/java-serialized-object) echo "ser" ;;
 	application/java-vm) echo "class" ;;
 	application/json) echo "json" ;;
+	application/json-patch+json) echo "json-patch" ;;
+	application/kate) echo "ogx" ;;
+	application/link-format) echo "wlnk" ;;
+	application/lostsync+xml) echo "lostsyncxml" ;;
+	application/lost+xml) echo "lostxml" ;;
 	application/mac-binhex40) echo "hqx" ;;
 	application/mac-compactpro) echo "cpt" ;;
 	application/mads+xml) echo "mads" ;;
@@ -48,6 +71,7 @@ function deduce_extension_from_mimetype() {
 	application/mathml+xml) echo "mathml" ;;
 	application/mbox) echo "mbox" ;;
 	application/mediaservercontrol+xml) echo "mscml" ;;
+	application/metalink+xml) echo "metalink" ;;
 	application/metalink4+xml) echo "meta4" ;;
 	application/mets+xml) echo "mets" ;;
 	application/mods+xml) echo "mods" ;;
@@ -55,11 +79,15 @@ function deduce_extension_from_mimetype() {
 	application/mp4) echo "mp4" ;;
 	application/msword) echo "doc" ;;
 	application/mxf) echo "mxf" ;;
+	application/ocsp-request) echo "orq" ;;
+	application/ocsp-response) echo "ors" ;;
 	application/octet-stream) echo "bin" ;;
 	application/oda) echo "oda" ;;
 	application/oebps-package+xml) echo "opf" ;;
 	application/ogg) echo "ogx" ;;
 	application/onenote) echo "onetoc" ;;
+	application/oxps) echo "oxps" ;;
+	application/p2p-overlay+xml) echo "relo" ;;
 	application/patch-ops-error+xml) echo "xer" ;;
 	application/pdf) echo "pdf" ;;
 	application/pgp-keys) echo "pgp" ;;
@@ -77,7 +105,11 @@ function deduce_extension_from_mimetype() {
 	application/pkix-pkipath) echo "pkipath" ;;
 	application/pls+xml) echo "pls" ;;
 	application/postscript) echo "ai" ;;
+	application/provenance+xml) echo "provx" ;;
 	application/prs.cww) echo "cww" ;;
+	application/prs.nprend) echo "rnd" ;; # .rct
+	application/prs.rdf-xml-crypt) echo "rdf-crypt" ;;
+	application/prs.xsf+xml) echo "xsf" ;;
 	application/pskc+xml) echo "pskcxml" ;;
 	application/rdf+xml) echo "rdf" ;;
 	application/reginfo+xml) echo "rif" ;;
@@ -85,6 +117,9 @@ function deduce_extension_from_mimetype() {
 	application/resource-lists-diff+xml) echo "rld" ;;
 	application/resource-lists+xml) echo "rl" ;;
 	application/rls-services+xml) echo "rs" ;;
+	application/rpki-ghostbusters) echo "gbr" ;;
+	application/rpki-manifest) echo "mft" ;;
+	application/rpki-roa) echo "roa" ;;
 	application/rsd+xml) echo "rsd" ;;
 	application/rss+xml) echo "xml" ;;
 	application/rtf) echo "rtf" ;;
@@ -96,17 +131,37 @@ function deduce_extension_from_mimetype() {
 	application/sdp) echo "sdp" ;;
 	application/set-payment-initiation) echo "setpay" ;;
 	application/set-registration-initiation) echo "setreg" ;;
+	application/sgml-open-catalog) echo "soc" ;;
 	application/shf+xml) echo "shf" ;;
+	application/sieve) echo "siv" ;; # .sieve
+	application/simple-filter+xml) echo "cl" ;;
 	application/smil+xml) echo "smi" ;;
 	application/sparql-query) echo "rq" ;;
 	application/sparql-results+xml) echo "srx" ;;
+	application/sql) echo "sql" ;;
 	application/srgs) echo "gram" ;;
 	application/srgs+xml) echo "grxml" ;;
 	application/sru+xml) echo "sru" ;;
 	application/ssml+xml) echo "ssml" ;;
+	application/tamp-apex-update-confirm) echo "auc" ;;
+	application/tamp-apex-update) echo "tau" ;;
+	application/tamp-community-update-confirm) echo "cuc" ;;
+	application/tamp-community-update) echo "tcu" ;;
+	application/tamp-error) echo "ter" ;;
+	application/tamp-sequence-adjust-confirm) echo "sac" ;;
+	application/tamp-sequence-adjust) echo "tsa" ;;
+	application/tamp-update-confirm) echo "tuc" ;;
+	application/tamp-update) echo "tur" ;;
 	application/tei+xml) echo "tei" ;;
 	application/thraud+xml) echo "tfi" ;;
+	application/timestamp-query) echo "tsq" ;;
+	application/timestamp-reply) echo "tsr" ;;
 	application/timestamped-data) echo "tsd" ;;
+	application/urc-grpsheet+xml) echo "gsheet" ;;
+	application/urc-ressheet+xml) echo "rsheet" ;;
+	application/urc-targetdesc+xml) echo "td" ;;
+	application/vnd.3gpp2.sms) echo "sms" ;;
+	application/vnd.3M.Post-it-Notes) echo "pwn" ;;
 	application/vnd.3gpp2.tcap) echo "tcap" ;;
 	application/vnd.3gpp.pic-bw-large) echo "plb" ;;
 	application/vnd.3gpp.pic-bw-small) echo "psb" ;;
@@ -117,6 +172,7 @@ function deduce_extension_from_mimetype() {
 	application/vnd.acucobol) echo "acu" ;;
 	application/vnd.acucorp) echo "atc" ;;
 	application/vnd.adobe.air-application-installer-package+zip) echo "air" ;;
+	application/vnd.adobe.formscentral.fcdt) echo "fcdt" ;;
 	application/vnd.adobe.fxp) echo "fxp" ;;
 	application/vnd.adobe.xdp+xml) echo "xdp" ;;
 	application/vnd.adobe.xfdf) echo "xfdf" ;;
@@ -133,10 +189,15 @@ function deduce_extension_from_mimetype() {
 	application/vnd.apple.installer+xml) echo "mpkg" ;;
 	application/vnd.apple.mpegurl) echo "m3u8" ;;
 	application/vnd.aristanetworks.swi) echo "swi" ;;
+	application/vnd.astraea-software.iota) echo "iota" ;;
 	application/vnd.audiograph) echo "aep" ;;
+	application/vnd.autopackage) echo "package" ;;
+	application/vnd.balsamiq.bmml+xml) echo "bmml" ;;
 	application/vnd.blueice.multipass) echo "mpm" ;;
+	application/vnd.bluetooth.ep.oob) echo "ep" ;;
 	application/vnd.bmi) echo "bmi" ;;
 	application/vnd.businessobjects) echo "rep" ;;
+	application/vnd.cendio.thinlinc.clientconf) echo "tlclient" ;;
 	application/vnd.chemdraw+xml) echo "cdxml" ;;
 	application/vnd.chipnuts.karaoke-mmd) echo "mmd" ;;
 	application/vnd.cinderella) echo "cdy" ;;
@@ -145,6 +206,7 @@ function deduce_extension_from_mimetype() {
 	application/vnd.clonk.c4group) echo "c4g" ;;
 	application/vnd.cluetrust.cartomobile-config) echo "c11amc" ;;
 	application/vnd.cluetrust.cartomobile-config-pkg) echo "c11amz" ;;
+	application/vnd.commerce-battelle) echo "ica" ;; # .icf, .icd, .ic0, .ic1, .ic2, .ic3, .ic4, .ic5, .ic6, .ic7, .ic8
 	application/vnd.commonspace) echo "csp" ;;
 	application/vnd.contact.cmsg) echo "cdbcmsg" ;;
 	application/vnd.cosmocaller) echo "cmc" ;;
@@ -156,15 +218,23 @@ function deduce_extension_from_mimetype() {
 	application/vnd.criticaltools.wbs+xml) echo "wbs" ;;
 	application/vnd.ctc-posml) echo "pml" ;;
 	application/vnd.cups-ppd) echo "ppd" ;;
+	application/vnd.curl) echo "curl" ;;
 	application/vnd.curl.car) echo "car" ;;
 	application/vnd.curl.pcurl) echo "pcurl" ;;
+	application/vnd.dart) echo "dart" ;;
 	application/vnd.data-vision.rdz) echo "rdz" ;;
 	application/vnd.debian.binary-package) echo "deb" ;;
+	application/vnd.dece.data) echo "uvf" ;; # .uvvf, .uvd, .uvvd
+	application/vnd.dece.ttml+xml) echo "uvt" ;; # .uvvt
+	application/vnd.dece.unspecified) echo "uvx" ;; # .uvvx
+	application/vnd.dece.zip) echo "uvz" ;; # .uvvz
 	application/vnd.denovo.fcselayout-link) echo "fe_launch" ;;
+	application/vnd.desmume.movie) echo "dsm" ;;
 	application/vnd.dna) echo "dna" ;;
 	application/vnd.dolby.mlp) echo "mlp" ;;
 	application/vnd.dpgraph) echo "dpg" ;;
 	application/vnd.dreamfactory) echo "dfac" ;;
+	application/vnd.dtg.local.flash) echo "fla" ;;
 	application/vnd.dvb.ait) echo "ait" ;;
 	application/vnd.dvb.service) echo "svc" ;;
 	application/vnd.dynageo) echo "geo" ;;
@@ -175,13 +245,17 @@ function deduce_extension_from_mimetype() {
 	application/vnd.epson.quickanime) echo "qam" ;;
 	application/vnd.epson.salt) echo "slt" ;;
 	application/vnd.epson.ssf) echo "ssf" ;;
+	application/vnd.ericsson.quickcall) echo "qcall" ;; # .qca
 	application/vnd.eszigno3+xml) echo "es3" ;;
 	application/vnd.ezpix-album) echo "ez2" ;;
 	application/vnd.ezpix-package) echo "ez3" ;;
 	application/vnd.fdf) echo "fdf" ;;
+	application/vnd.fdsn.mseed) echo "msd" ;; # .mseed
+	application/vnd.FloGraphIt) echo "gph" ;;
 	application/vnd.fdsn.seed) echo "seed" ;;
 	application/vnd.flographit) echo "gph" ;;
 	application/vnd.fluxtime.clip) echo "ftc" ;;
+	application/vnd.font-fontforge-sfd) echo "sfd" ;;
 	application/vnd.framemaker) echo "fm" ;;
 	application/vnd.frogans.fnc) echo "fnc" ;;
 	application/vnd.frogans.ltf) echo "ltf" ;;
@@ -196,6 +270,8 @@ function deduce_extension_from_mimetype() {
 	application/vnd.fujixerox.docuworks) echo "xdw" ;;
 	application/vnd.fuzzysheet) echo "fzs" ;;
 	application/vnd.genomatix.tuxedo) echo "txd" ;;
+	application/vnd.geocube+xml) echo "g3" ;; # .g³
+	application/vnd.HandHeld-Entertainment+xml) echo "zmm" ;;
 	application/vnd.geogebra.file) echo "ggb" ;;
 	application/vnd.geogebra.tool) echo "ggt" ;;
 	application/vnd.geometry-explorer) echo "gex" ;;
@@ -217,6 +293,8 @@ function deduce_extension_from_mimetype() {
 	application/vnd.handheld-entertainment+xml) echo "zmm" ;;
 	application/vnd.hbci) echo "hbci" ;;
 	application/vnd.hhe.lesson-player) echo "les" ;;
+	application/vnd.hp-HPGL) echo "hpgl" ;;
+	application/vnd.hp-PCL) echo "pcl" ;;
 	application/vnd.hp-hpgl) echo "hpgl" ;;
 	application/vnd.hp-hpid) echo "hpid" ;;
 	application/vnd.hp-hps) echo "hps" ;;
@@ -225,11 +303,15 @@ function deduce_extension_from_mimetype() {
 	application/vnd.hp-pclxl) echo "pclxl" ;;
 	application/vnd.hydrostatix.sof-data) echo "sfd-hdstx" ;;
 	application/vnd.hzn-3d-crossword) echo "x3d" ;;
+	application/vnd.ibm.electronic-media) echo "emm" ;;
+	application/vnd.ibm.MiniPay) echo "mpy" ;;
 	application/vnd.ibm.minipay) echo "mpy" ;;
 	application/vnd.ibm.modcap) echo "afp" ;;
 	application/vnd.ibm.rights-management) echo "irm" ;;
 	application/vnd.ibm.secure-container) echo "sc" ;;
 	application/vnd.iccprofile) echo "icc" ;;
+	application/vnd.ieee.1905) echo "1905.1" ;;
+	application/vnd.Kinar) echo "kne" ;; # .knp, .sdf
 	application/vnd.igloader) echo "igl" ;;
 	application/vnd.immervision-ivp) echo "ivp" ;;
 	application/vnd.immervision-ivu) echo "ivu" ;;
@@ -271,6 +353,15 @@ function deduce_extension_from_mimetype() {
 	application/vnd.lotus-screencam) echo "scm" ;;
 	application/vnd.lotus-wordpro) echo "lwp" ;;
 	application/vnd.macports.portpkg) echo "portpkg" ;;
+	application/vnd.marlin.drm.mdcf) echo "mdc" ;;
+	application/vnd.MFER) echo "mwf" ;;
+	application/vnd.Mobius.DAF) echo "daf" ;;
+	application/vnd.Mobius.DIS) echo "dis" ;;
+	application/vnd.Mobius.MBK) echo "mbk" ;;
+	application/vnd.Mobius.MQY) echo "mqy" ;;
+	application/vnd.Mobius.MSL) echo "msl" ;;
+	application/vnd.Mobius.PLC) echo "plc" ;;
+	application/vnd.Mobius.TXF) echo "txf" ;;
 	application/vnd.mcd) echo "mcd" ;;
 	application/vnd.medcalcdata) echo "mc1" ;;
 	application/vnd.mediastation.cdkey) echo "cdkey" ;;
@@ -290,7 +381,20 @@ function deduce_extension_from_mimetype() {
 	application/vnd.mophun.certificate) echo "mpc" ;;
 	application/vnd.mozilla.xul+xml) echo "xul" ;;
 	application/vnd.ms-artgalry) echo "cil" ;;
+	application/vnd.ms-asf) echo "asf" ;;
 	application/vnd.ms-cab-compressed) echo "cab" ;;
+	application/vnd.ms-excel.addin.macroEnabled.12) echo "xlam" ;;
+	application/vnd.ms-excel.sheet.binary.macroEnabled.12) echo "xlsb" ;;
+	application/vnd.ms-excel.sheet.macroEnabled.12) echo "xlsm" ;;
+	application/vnd.ms-excel.template.macroEnabled.12) echo "xltm" ;;
+	application/vnd.ms-powerpoint.addin.macroEnabled.12) echo "ppam" ;;
+	application/vnd.ms-powerpoint.presentation.macroEnabled.12) echo "pptm" ;;
+	application/vnd.ms-powerpoint.slide.macroEnabled.12) echo "sldm" ;;
+	application/vnd.ms-powerpoint.slideshow.macroEnabled.12) echo "ppsm" ;;
+	application/vnd.ms-powerpoint.template.macroEnabled.12) echo "potm" ;;
+	application/vnd.ms-tnef) echo "tnef" ;; # .tnf
+	application/vnd.ms-word.document.macroEnabled.12) echo "docm" ;;
+	application/vnd.ms-word.template.macroEnabled.12) echo "dotm" ;;
 	application/vnd.mseq) echo "mseq" ;;
 	application/vnd.ms-excel.addin.macroenabled.12) echo "xlam" ;;
 	application/vnd.ms-excel) echo "xls" ;;
@@ -317,16 +421,26 @@ function deduce_extension_from_mimetype() {
 	application/vnd.ms-works) echo "wps" ;;
 	application/vnd.ms-wpl) echo "wpl" ;;
 	application/vnd.ms-xpsdocument) echo "xps" ;;
+	application/vnd.multiad.creator.cif) echo "cif" ;;
+	application/vnd.multiad.creator) echo "crtr" ;;
 	application/vnd.musician) echo "mus" ;;
 	application/vnd.muvee.style) echo "msty" ;;
+	application/vnd.mynfc) echo "taglet" ;;
+	application/vnd.nervana) echo "entity" ;; # .request, .bkm, .kcm
 	application/vnd.neurolanguage.nlu) echo "nlu" ;;
+	application/vnd.nintendo.nitro.rom) echo "nds" ;;
+	application/vnd.nitf) echo "nitf" ;;
 	application/vnd.noblenet-directory) echo "nnd" ;;
 	application/vnd.noblenet-sealer) echo "nns" ;;
 	application/vnd.noblenet-web) echo "nnw" ;;
+	application/vnd.nokia.n-gage.ac+xml) echo "ac" ;;
 	application/vnd.nokia.n-gage.data) echo "ngdat" ;;
 	application/vnd.nokia.n-gage.symbian.install) echo "n-gage" ;;
 	application/vnd.nokia.radio-preset) echo "rpst" ;;
 	application/vnd.nokia.radio-presets) echo "rpss" ;;
+	application/vnd.novadigm.EDM) echo "edm" ;;
+	application/vnd.novadigm.EDX) echo "edx" ;;
+	application/vnd.novadigm.EXT) echo "ext" ;;
 	application/vnd.novadigm.edm) echo "edm" ;;
 	application/vnd.novadigm.edx) echo "edx" ;;
 	application/vnd.novadigm.ext) echo "ext" ;;
@@ -348,7 +462,13 @@ function deduce_extension_from_mimetype() {
 	application/vnd.oasis.opendocument.text-template) echo "ott" ;;
 	application/vnd.oasis.opendocument.text-web) echo "oth" ;;
 	application/vnd.olpc-sugar) echo "xo" ;;
+	application/vnd.oma.dd+xml) echo "dd" ;;
 	application/vnd.oma.dd2+xml) echo "dd2" ;;
+	application/vnd.oma.drm.content) echo "dcf" ;;
+	application/vnd.oma.drm.dcf) echo "o4a" ;; # .o4v
+	application/vnd.oma.drm.message) echo "dm" ;;
+	application/vnd.oma.drm.rights+wbxml) echo "drc" ;;
+	application/vnd.oma.drm.rights+xml) echo "dr" ;;
 	application/vnd.openofficeorg.extension) echo "oxt" ;;
 	application/vnd.openxmlformats-officedocument.presentationml.presentation) echo "pptx" ;;
 	application/vnd.openxmlformats-officedocument.presentationml.slide) echo "sldx" ;;
@@ -358,21 +478,29 @@ function deduce_extension_from_mimetype() {
 	application/vnd.openxmlformats-officedocument.spreadsheetml.template) echo "xltx" ;;
 	application/vnd.openxmlformats-officedocument.wordprocessingml.document) echo "docx" ;;
 	application/vnd.openxmlformats-officedocument.wordprocessingml.template) echo "dotx" ;;
+	application/vnd.osa.netdeploy) echo "ndc" ;;
 	application/vnd.osgeo.mapguide.package) echo "mgp" ;;
 	application/vnd.osgi.dp) echo "dp" ;;
+	application/vnd.osgi.subsystem) echo "esa" ;;
 	application/vnd.palm) echo "pdb" ;;
 	application/vnd.pawaafile) echo "paw" ;;
 	application/vnd.pg.format) echo "str" ;;
 	application/vnd.pg.osasli) echo "ei6" ;;
+	application/vnd.piaccess.application-license) echo "pil" ;;
 	application/vnd.picsel) echo "efif" ;;
 	application/vnd.pmi.widget) echo "wg" ;;
 	application/vnd.pocketlearn) echo "plf" ;;
 	application/vnd.powerbuilder6) echo "pbd" ;;
+	application/vnd.preminet) echo "preminet" ;;
 	application/vnd.previewsystems.box) echo "box" ;;
 	application/vnd.proteus.magazine) echo "mgz" ;;
 	application/vnd.publishare-delta-tree) echo "qps" ;;
 	application/vnd.pvi.ptid1) echo "ptid" ;;
+	application/vnd.qualcomm.brew-app-res) echo "bar" ;;
+	application/vnd.Quark.QuarkXPress) echo "qxd" ;; # .qxt, .qwd, .qwt, .qxl, .qxb
 	application/vnd.quark.quarkxpress) echo "qxd" ;;
+	application/vnd.quobject-quoxdocument) echo "quox" ;; # .quiz
+	application/vnd.rainstor.data) echo "tree" ;;
 	application/vnd.realvnc.bed) echo "bed" ;;
 	application/vnd.recordare.musicxml) echo "mxl" ;;
 	application/vnd.recordare.musicxml+xml) echo "musicxml" ;;
@@ -381,6 +509,18 @@ function deduce_extension_from_mimetype() {
 	application/vnd.rn-realmedia) echo "rm" ;;
 	application/vnd.route66.link66+xml) echo "link66" ;;
 	application/vnd.sailingtracker.track) echo "st" ;;
+	application/vnd.scribus) echo "scd" ;; # .sla, .slaz
+	application/vnd.sealed.3df) echo "s3df" ;;
+	application/vnd.sealed.csf) echo "scsf" ;;
+	application/vnd.sealed.doc) echo "sdoc" ;; # .sdo, .s1w
+	application/vnd.sealed.eml) echo "seml" ;; # .sem
+	application/vnd.sealedmedia.softseal.html) echo "stml" ;; # .s1h
+	application/vnd.sealedmedia.softseal.pdf) echo "spdf" ;; # .spd, .s1a
+	application/vnd.sealed.mht) echo "smht" ;; # .smh
+	application/vnd.sealed.ppt) echo "sppt" ;; # .s1p
+	application/vnd.sealed.tiff) echo "stif" ;;
+	application/vnd.sealed.xls) echo "sxls" ;; # .sxl, .s1e
+	application/vnd.SimTech-MindMapper) echo "twd" ;; # .twds
 	application/vnd.seemail) echo "see" ;;
 	application/vnd.sema) echo "sema" ;;
 	application/vnd.semd) echo "semd" ;;
@@ -391,7 +531,10 @@ function deduce_extension_from_mimetype() {
 	application/vnd.shana.informed.package) echo "ipk" ;;
 	application/vnd.simtech-mindmapper) echo "twd" ;;
 	application/vnd.smaf) echo "mmf" ;;
+	application/vnd.smart.notebook) echo "notebook" ;;
 	application/vnd.smart.teacher) echo "teacher" ;;
+	application/vnd.software602.filler.form+xml) echo "fo" ;;
+	application/vnd.software602.filler.form-xml-zip) echo "zfo" ;;
 	application/vnd.solent.sdkm+xml) echo "sdkm" ;;
 	application/vnd.spotfire.dxp) echo "dxp" ;;
 	application/vnd.spotfire.sfs) echo "sfs" ;;
@@ -401,7 +544,9 @@ function deduce_extension_from_mimetype() {
 	application/vnd.stardivision.math) echo "smf" ;;
 	application/vnd.stardivision.writer) echo "sdw" ;;
 	application/vnd.stardivision.writer-global) echo "sgl" ;;
+	application/vnd.stepmania.package) echo "smzip" ;;
 	application/vnd.stepmania.stepchart) echo "sm" ;;
+	application/vnd.sun.wadl+xml) echo "wadl" ;;
 	application/vnd.sun.xml.calc) echo "sxc" ;;
 	application/vnd.sun.xml.calc.template) echo "stc" ;;
 	application/vnd.sun.xml.draw) echo "sxd" ;;
@@ -418,7 +563,9 @@ function deduce_extension_from_mimetype() {
 	application/vnd.syncml.dm+wbxml) echo "bdm" ;;
 	application/vnd.syncml.dm+xml) echo "xdm" ;;
 	application/vnd.syncml+xml) echo "xsm" ;;
+	application/vnd.syncml.dmddf+xml) echo "ddf" ;;
 	application/vnd.tao.intent-module-archive) echo "tao" ;;
+	application/vnd.tcpdump.pcap) echo "pcap" ;; # .cap, .dmp
 	application/vnd.tmobile-livetv) echo "tmo" ;;
 	application/vnd.trid.tpt) echo "tpt" ;;
 	application/vnd.triscape.mxs) echo "mxs" ;;
@@ -429,20 +576,34 @@ function deduce_extension_from_mimetype() {
 	application/vnd.unity) echo "unityweb" ;;
 	application/vnd.uoml+xml) echo "uoml" ;;
 	application/vnd.vcx) echo "vcx" ;;
+	application/vnd.vd-study) echo "mxi" ;; # .study-inter, .model-inter
+	application/vnd.vectorworks) echo "vwx" ;;
+	application/vnd.vidsoft.vidconference) echo "vsc" ;;
 	application/vnd.visio2013) echo "vsdx" ;;
 	application/vnd.visio) echo "vsd" ;;
 	application/vnd.visionary) echo "vis" ;;
 	application/vnd.vsf) echo "vsf" ;;
+	application/vnd.wap.mms-message) echo "mms" ;;
+	application/vnd.wap.sic) echo "sic" ;;
+	application/vnd.wap.slc) echo "slc" ;;
 	application/vnd.wap.wbxml) echo "wbxml" ;;
 	application/vnd.wap.wmlc) echo "wmlc" ;;
 	application/vnd.wap.wmlscriptc) echo "wmlsc" ;;
 	application/vnd.webturbo) echo "wtb" ;;
+	application/vnd.wfa.wsc) echo "wsc" ;;
+	application/vnd.wmc) echo "wmc" ;;
+	application/vnd.wolfram.mathematica.package) echo "m" ;;
 	application/vnd.wolfram.player) echo "nbp" ;;
 	application/vnd.wordperfect) echo "wpd" ;;
 	application/vnd.wqd) echo "wqd" ;;
 	application/vnd.wt.stf) echo "stf" ;;
+	application/vnd.wv.csp+wbxml) echo "wv" ;;
 	application/vnd.xara) echo "xar" ;;
 	application/vnd.xfdl) echo "xfdl" ;;
+	application/vnd.xmpie.cpkg) echo "cpkg" ;;
+	application/vnd.xmpie.dpkg) echo "dpkg" ;;
+	application/vnd.xmpie.ppkg) echo "ppkg" ;;
+	application/vnd.xmpie.xlim) echo "xlim" ;;
 	application/vnd.yamaha.hv-dic) echo "hvd" ;;
 	application/vnd.yamaha.hv-script) echo "hvs" ;;
 	application/vnd.yamaha.hv-voice) echo "hvp" ;;
@@ -454,6 +615,7 @@ function deduce_extension_from_mimetype() {
 	application/vnd.zul) echo "zir" ;;
 	application/vnd.zzazz.deck+xml) echo "zaz" ;;
 	application/voicexml+xml) echo "vxml" ;;
+	application/watcherinfo+xml) echo "wif" ;;
 	application/widget) echo "wgt" ;;
 	application/winhlp) echo "hlp" ;;
 	application/wsdl+xml) echo "wsdl" ;;
@@ -462,6 +624,7 @@ function deduce_extension_from_mimetype() {
 	application/x-7z-compressed) echo "7z" ;;
 	application/x-abiword) echo "abw" ;;
 	application/x-ace-compressed) echo "ace" ;;
+	application/x-annodex) echo "anx" ;;
 	application/x-apple-diskimage) echo "dmg" ;;
 	application/x-archive) echo "a" ;;
 	application/x-arj) echo "arj" ;;
@@ -472,6 +635,8 @@ function deduce_extension_from_mimetype() {
 	application/x-bittorrent) echo "torrent" ;;
 	application/x-bzip2) echo "bz2" ;;
 	application/x-bzip) echo "bz" ;;
+	application/xcap-att+xml) echo "xav" ;;
+	application/xcap-caps+xml) echo "xca" ;;
 	application/xcap-diff+xml) echo "xdf" ;;
 	application/x-cdlink) echo "vcd" ;;
 	application/x-chat) echo "chat" ;;
@@ -495,6 +660,19 @@ function deduce_extension_from_mimetype() {
 	application/x-dvi) echo "dvi" ;;
 	application/x-elc) echo "sml" ;; # can also be .out
 	application/x-empty) echo "$mimetype" ;; # empty file
+	application/xcap-el+xml) echo "xel" ;;
+	application/xcap-error+xml) echo "xer" ;;
+	application/xcap-ns+xml) echo "xns" ;;
+	application/x-chrome-extension) echo "crx" ;;
+	application/x-java-archive) echo "jar" ;;
+	application/x-java-pack200) echo "pack" ;;
+	application/x-killustrator) echo "kil" ;;
+	application/x-perl) echo "pl" ;;
+	application/x-rpm) echo "rpm" ;;
+	application/x-troff-man) echo "man" ;; # .1, .2, .3, .4, .5, .6, .7, .8
+	application/x-troff-me) echo "me" ;;
+	application/x-troff-ms) echo "ms" ;;
+	application/x-xspf+xml) echo "xspf" ;;
 	application/xenc+xml) echo "xenc" ;;
 	application/x-font-bdf) echo "bdf" ;;
 	application/x-font-ghostscript) echo "gsf" ;;
@@ -590,26 +768,52 @@ function deduce_extension_from_mimetype() {
 	application/yin+xml) echo "yin" ;;
 	application/zip) echo "zip" ;;
 	application/zlib) echo "ortho" ;; # can also be .json
+	audio/32kadpcm) echo "726" ;;
+	audio/ac3) echo "ac3" ;;
+	audio/AMR) echo "amr" ;;
+	audio/AMR-WB) echo "awb" ;;
 	audio/adpcm) echo "adp" ;;
+	audio/annodex) echo "axa" ;;
+	audio/asc) echo "acn" ;;
+	audio/ATRAC3) echo "at3" ;; # .aa3, .omg
+	audio/ATRAC-ADVANCED-LOSSLESS) echo "aal" ;;
+	audio/ATRAC-X) echo "atx" ;;
 	audio/basic) echo "au" ;;
+	audio/dls) echo "dls" ;;
+	audio/EVRCB) echo "evb" ;;
+	audio/EVRC) echo "evc" ;;
+	audio/EVRCNW) echo "enw" ;;
+	audio/EVRCWB) echo "evw" ;;
+	audio/iLBC) echo "lbc" ;;
+	audio/L16) echo "l16" ;;
 	audio/midi) echo "mid" ;;
+	audio/mobile-xmf) echo "mxmf" ;;
 	audio/mp4) echo "mp4a" ;;
 	audio/mpeg) echo "mpga" ;;
 	audio/ogg) echo "oga" ;;
+	audio/prs.sid) echo "sid" ;; # .psid
+	audio/qcelp) echo "qcp" ;;
+	audio/SMV) echo "smv" ;;
+	audio/vnd.audikoz) echo "koz" ;;
 	audio/vnd.dece.audio) echo "uva" ;;
 	audio/vnd.digital-winds) echo "eol" ;;
+	audio/vnd.dolby.mlp) echo "mlp" ;;
 	audio/vnd.dra) echo "dra" ;;
 	audio/vnd.dts) echo "dts" ;;
 	audio/vnd.dts.hd) echo "dtshd" ;;
+	audio/vnd.everad.plj) echo "plj" ;;
 	audio/vnd.lucent.voice) echo "lvp" ;;
 	audio/vnd.ms-playready.media.pya) echo "pya" ;;
+	audio/vnd.nortel.vbk) echo "vbk" ;;
 	audio/vnd.nuera.ecelp4800) echo "ecelp4800" ;;
 	audio/vnd.nuera.ecelp7470) echo "ecelp7470" ;;
 	audio/vnd.nuera.ecelp9600) echo "ecelp9600" ;;
 	audio/vnd.rip) echo "rip" ;;
+	audio/vnd.sealedmedia.softseal.mpeg) echo "smp3" ;; # .smp, .s1m
 	audio/webm) echo "weba" ;;
 	audio/x-aac) echo "aac" ;;
 	audio/x-aiff) echo "aif" ;;
+	audio/x-annodex) echo "axa" ;;
 	audio/x-flac) echo "flac" ;;
 	audio/x-mod) echo "xm" ;; # can also be .mod
 	audio/x-mp4a-latm) echo "$mimetype" ;;
@@ -618,6 +822,9 @@ function deduce_extension_from_mimetype() {
 	audio/x-ms-wma) echo "wma" ;;
 	audio/x-pn-realaudio) echo "ram" ;;
 	audio/x-pn-realaudio-plugin) echo "rmp" ;;
+	audio/x-realaudio) echo "ra" ;;
+	audio/x-s3m) echo "s3m" ;;
+	audio/x-stm) echo "stm" ;;
 	audio/x-wav) echo "wav" ;;
 	chemical/x-cdx) echo "cdx" ;;
 	chemical/x-cif) echo "cif" ;;
@@ -627,18 +834,25 @@ function deduce_extension_from_mimetype() {
 	chemical/x-xyz) echo "xyz" ;;
 	image/bmp) echo "bmp" ;;
 	image/cgm) echo "cgm" ;;
+	image/fits) echo "fits" ;; # .fit, .fts
 	image/g3fax) echo "g3" ;;
 	image/gif) echo "gif" ;;
 	image/ief) echo "ief" ;;
 	image/jp2) echo "css" ;;
 	image/jpeg) echo "jpg" ;;
+	image/jpm) echo "jpm" ;; # .jpgm
+	image/jpx) echo "jpx" ;; # .jpf
 	image/ktx) echo "ktx" ;;
 	image/pjpeg) echo "pjpeg" ;;
 	image/png) echo "png" ;;
 	image/prs.btif) echo "btif" ;;
+	image/prs.pti) echo "pti" ;;
 	image/svg+xml) echo "svg" ;;
+	image/t38) echo "t38" ;;
 	image/tiff) echo "tiff" ;;
+	image/tiff-fx) echo "tfx" ;;
 	image/vnd.adobe.photoshop) echo "psd" ;;
+	image/vnd.airzip.accelerator.azv) echo "azv" ;;
 	image/vnd.dece.graphic) echo "uvi" ;;
 	image/vnd.djvu) echo "djvu" ;;
 	image/vnd.dvb.subtitle) echo "sub" ;;
@@ -649,8 +863,14 @@ function deduce_extension_from_mimetype() {
 	image/vnd.fst) echo "fst" ;;
 	image/vnd.fujixerox.edmics-mmr) echo "mmr" ;;
 	image/vnd.fujixerox.edmics-rlc) echo "rlc" ;;
+	image/vnd.globalgraphics.pgb) echo "pgb" ;;
+	image/vnd.microsoft.icon) echo "ico" ;;
 	image/vnd.ms-modi) echo "mdi" ;;
 	image/vnd.net-fpx) echo "npx" ;;
+	image/vnd.radiance) echo "hdr" ;; # .rgbe, .xyze
+	image/vnd.sealedmedia.softseal.gif) echo "sgif" ;; # .sgi, .s1g
+	image/vnd.sealedmedia.softseal.jpg) echo "sjpg" ;; # .sjp, .s1j
+	image/vnd.sealed.png) echo "spng" ;; # .spn, .s1n
 	image/vnd.wap.wbmp) echo "wbmp" ;;
 	image/vnd.xiff) echo "xif" ;;
 	image/webp) echo "webp" ;;
@@ -662,6 +882,7 @@ function deduce_extension_from_mimetype() {
 	image/x-freehand) echo "fh" ;;
 	image/x-icon) echo "ico" ;;
 	image/x-ms-bmp) echo "bmp" ;; # also seen .jpg, .ico, .sys, .gif, .org
+	image/x-panasonic-rw2) echo "rw2" ;;
 	image/x-pcx) echo "pcx" ;;
 	image/x-pict) echo "pic" ;;
 	image/x-png) echo "png" ;;
@@ -671,6 +892,7 @@ function deduce_extension_from_mimetype() {
 	image/x-portable-greymap) echo "pgm" ;; # also seen .map
 	image/x-portable-pixmap) echo "ppm" ;;
 	image/x-rgb) echo "rgb" ;;
+	image/x-targa) echo "tga" ;;
 	image/x-xbitmap) echo "xbm" ;;
 	image/x-xcf) echo "xcf" ;;
 	image/x-xpixmap) echo "xpm" ;;
@@ -683,6 +905,10 @@ function deduce_extension_from_mimetype() {
 	inode/socket) echo "sock" ;; # also .socket, .progress
 	inode/symlink) echo "$mimetype" ;;
 	inode/x-empty) echo "$mimetype" ;; # empty file
+	message/global-delivery-status) echo "u8dsn" ;;
+	message/global-disposition-notification) echo "u8mdn" ;;
+	message/global) echo "u8msg" ;;
+	message/global-headers) echo "u8hdr" ;;
 	message/news) echo "$mimetype" ;;
 	message/rfc822) echo "eml" ;;
 	model/iges) echo "igs" ;;
@@ -691,17 +917,28 @@ function deduce_extension_from_mimetype() {
 	model/vnd.dwf) echo "dwf" ;;
 	model/vnd.gdl) echo "gdl" ;;
 	model/vnd.gtw) echo "gtw" ;;
+	model/vnd.moml+xml) echo "moml" ;;
 	model/vnd.mts) echo "mts" ;;
+	model/vnd.parasolid.transmit.binary) echo "x_b" ;; # .xmt_bin
+	model/vnd.parasolid.transmit.text) echo "x_t" ;; # .xmt_txt
 	model/vnd.vtu) echo "vtu" ;;
 	model/vrml) echo "wrl" ;;
+	multipart/voice-message) echo "vpm" ;;
+	text/cache-manifest) echo "appcache" ;; # .manifest
 	text/calendar) echo "ics" ;;
 	text/css) echo "css" ;;
 	text/csv) echo "csv" ;;
+	text/dns) echo "soa" ;; # .zone
 	text/html) echo "html" ;;
+	text/html-sandboxed) echo "sandboxed" ;;
+	text/jcr-cnd) echo "cnd" ;;
+	text/mizar) echo "miz" ;;
 	text/n3) echo "n3" ;;
 	text/PGP) echo "fw" ;;
 	text/plain-bas) echo "par" ;;
 	text/plain) echo "txt" ;;
+	text/provenance-notation) echo "provn" ;;
+	text/prs.fallenstein.rst) echo "rst" ;;
 	text/prs.lines.tag) echo "dsc" ;;
 	text/richtext) echo "rtx" ;;
 	text/rtf) echo "rtf" ;; # also seen .doc
@@ -711,16 +948,27 @@ function deduce_extension_from_mimetype() {
 	text/turtle) echo "ttl" ;;
 	text/uri-list) echo "uri" ;;
 	text/vcard) echo "vcf" ;;
+	text/vnd.abc) echo "abc" ;;
 	text/vnd.curl.dcurl) echo "dcurl" ;;
 	text/vnd.curl) echo "curl" ;;
 	text/vnd.curl.mcurl) echo "mcurl" ;;
 	text/vnd.curl.scurl) echo "scurl" ;;
+	text/vnd.debian.copyright) echo "copyright" ;;
+	text/vnd.DMClientScript) echo "dms" ;;
+	text/vnd.dvb.subtitle) echo "sub" ;;
+	text/vnd.esmertec.theme-descriptor) echo "jtd" ;;
 	text/vnd.fly) echo "fly" ;;
 	text/vnd.fmi.flexstor) echo "flx" ;;
 	text/vnd.graphviz) echo "gv" ;;
 	text/vnd.in3d.3dml) echo "3dml" ;;
 	text/vnd.in3d.spot) echo "spot" ;;
+	text/vnd.ms-mediapackage) echo "mpf" ;;
+	text/vnd.net2phone.commcenter.command) echo "ccc" ;;
+	text/vnd.si.uricatalogue) echo "uric" ;;
 	text/vnd.sun.j2me.app-descriptor) echo "jad" ;;
+	text/vnd.trolltech.linguist) echo "ts" ;;
+	text/vnd.wap.si) echo "si" ;;
+	text/vnd.wap.sl) echo "sl" ;;
 	text/vnd.wap.wml) echo "wml" ;;
 	text/vnd.wap.wmlscript) echo "wmls" ;;
 	text/x-asm) echo "s" ;;
@@ -766,14 +1014,28 @@ function deduce_extension_from_mimetype() {
 	text/x-vcalendar) echo "vcs" ;;
 	text/x-vcard) echo "vcf" ;;
 	text/x-shellscript) echo "sh" ;;
+	text/xml) echo "xml" ;; # .xsd, .rng
+	text/xml-external-parsed-entity) echo "ent" ;;
+	text/x-pod) echo "pod" ;;
 	text/yaml) echo "yaml" ;;
 	video/3gpp2) echo "3g2" ;;
 	video/3gpp) echo "3gp" ;;
+	video/annodex) echo "axv" ;;
 	video/h261) echo "h261" ;;
 	video/h263) echo "h263" ;;
 	video/h264) echo "h264" ;;
 	video/jpeg) echo "jpgv" ;;
 	video/jpm) echo "jpm" ;;
+	video/vnd.dece.mp4) echo "uvu" ;; # .uvvu
+	video/vnd.dvb.file) echo "dvb" ;;
+	video/vnd.nokia.interleaved-multimedia) echo "nim" ;;
+	video/vnd.sealedmedia.softseal.mov) echo "smov" ;; # .smo, .s1q
+	video/vnd.sealed.mpeg1) echo "smpg" ;; # .s11
+	video/vnd.sealed.mpeg4) echo "s14" ;;
+	video/vnd.sealed.swf) echo "sswf" ;; # .ssw
+	video/x-annodex) echo "axv" ;;
+	video/x-javafx) echo "fxm" ;;
+	video/x-matroska) echo "mkv" ;;
 	video/mj2) echo "mj2" ;;
 	video/mp4) echo "mp4" ;;
 	video/mpeg) echo "mpeg" ;;
@@ -885,13 +1147,45 @@ function cat_unoconv() {
 function cat_exiftool() {
 	[ ! $(command -v exiftool) ] && return 1
 
-	exiftool "$INPUT"
+	exiftool "$INPUT" --ThumbnailImage --Picture
 }
+
+function cat_exiftool_thumbnail() {
+	[ ! $(command -v exiftool) ] && return 1
+	[ ! $(command -v jp2a) ] && return 1
+	[ ! $(command -v convert) ] && return 1
+
+	# Printing thumnails is useful for raw photo images that otherwise need special software
+	# to handle and convert. For large JPEG images that include thumbnails, however, we have
+	# better performance running the full image through jp2a than extracting the (smaller)
+	# thumbnail and parsing that instead.
+	if [[ ! -z "$(exiftool "$INPUT" -ThumbnailImage)" ]]; then
+		exiftool "$INPUT" -ThumbnailImage -b | convert - jpg:- | jp2a --invert --colors --width="$(tput cols)" -
+		return 0
+	elif [[ ! -z "$(exiftool "$INPUT" -Picture)" ]]; then
+		exiftool "$INPUT" -Picture -b | convert - jpg:- | jp2a --invert --colors --width="$(tput cols)" -
+		return 0
+	fi
+
+	return 99
+}
+
 
 function cat_metaflac() {
 	[ ! $(command -v metaflac) ] && return 1
 
 	metaflac --except-block-type="PICTURE" --list "$INPUT"
+}
+
+function cat_metaflac_thumbnail() {
+	[ ! $(command -v metaflac) ] && return 1
+
+	if [[ ! -z $(metaflac --list --block-type=PICTURE "$INPUT" ) ]]; then
+		metaflac --export-picture-to=- "$INPUT" | convert - jpg:- | jp2a --invert --colors  -
+		return 0
+	fi
+
+	return 99
 }
 
 function cat_jp2a() {
@@ -918,6 +1212,11 @@ function cat_unoconv_jp2a() {
 	unoconv --stdout --format=jpg "$INPUT" | jp2a --invert --colors --width="$(tput cols)" -
 }
 
+function cat_video_to_ascii() {
+	[ ! $(command -v video-to-ascii) ] && return 1
+
+	video-to-ascii -f "$INPUT" && clear
+}
 
 if [[ $# == 0 ]]; then
 	set -- '-h'
@@ -934,6 +1233,11 @@ while (( $# )); do
 		shift
 		ECHOMIMEONLY=1
 		;;
+	-o|--open)
+		# Short hand option for giving up and opening the file via GUI instead
+		XGD_OPEN_FILE_INSTEAD_OF_CAT=1
+		shift
+		;;
 	-h|--help)
 		shift
 		args_format="  %-31s%s\n"
@@ -942,7 +1246,7 @@ while (( $# )); do
 		printf "%s\n\n" "Extended cat utility that chooses an appropriate command line tool based on the file extension to concatenate and print file content to the standard output."
 		printf "%s\n" "This script may refer to the following command line tools:"
 		printf "    %s\n" "cat (default), zcat, bzcat, lzip, pdftotext, 7z, arj, tar, exiftool, unoconv, ufraw-batch,"
-		printf "    %s\n" "convert (imagemagick), jp2a, metaflac, lsd, source-highlight"
+		printf "    %s\n" "convert (imagemagick), jp2a, metaflac, lsd, source-highlight, video-to-ascii"
 		printf "\n%s\n" "Some of the above may need to be installed, try:"
 		printf "    %s\n\n" "sudo apt-get install odt2txt"
 		echo
@@ -962,6 +1266,11 @@ for INPUT in "$@"
 do
 	if [ ! -e "$INPUT" ]; then
 		echo "File $INPUT does not exist"
+		continue
+	fi
+
+	if [ "${XGD_OPEN_FILE_INSTEAD_OF_CAT}" = 1 ]; then
+		xdg-open "$INPUT"
 		continue
 	fi
 
@@ -1003,8 +1312,25 @@ do
 	arj)        cat_7z || cat_arj ;;
 	rar)        cat_7z || cat_rar ;;
 	zst)        [ $(command -v zstdcat) ] && zstdcat "$INPUT" ;;
-	7z|cab|cpio|rpm|iso|deb|pptm)
-		cat_7z ;;
+	iso)
+		case $mimetype in
+		application/x-iso9660-image) # Video DVD .iso file
+			if [[ "$FORCE" == 1 ]] &&
+			   [ $(command -v video-to-ascii) ] &&
+			   [ $(command -v 7z) ] &&
+			   [[ ! -z $(7z l "$INPUT" | grep 'VIDEO_TS') ]]; then
+				cat_video_to_ascii
+				continue
+			fi
+			;&
+		*)
+			cat_7z
+			;;
+		esac
+		;;
+	7z|cab|cpio|rpm|deb|pptm)
+		cat_7z
+		;;
 	jar|zip)
 		cat_zip ;;
 	lz)
@@ -1039,8 +1365,8 @@ do
 	vor|vor|vor|vor|wmf|xml|xpm)
 		cat_unoconv_jp2a ;;
 	### Images ###
-	jpg|jpeg)
-		cat_exiftool; cat_jp2a ;;
+	jpg|jpeg|jfif)
+		cat_exiftool || cat_jp2a ;;
 	bmp|emf|eps|fodg|html|met|odd|otg|pbm|pct|pdf|pgm|png|ppm|ras|std) ;&
 	svg|svm|swf|sxd|sxw|tiff|vor|wmf|xhtml|xpm)
 		cat_unoconv_jp2a ;;
@@ -1054,13 +1380,59 @@ do
 	pages|pbm|pcd|pef|pfa|pfb|pfm|pgf|pgm|pict|pmp|ppm|ppt|pptx|ps|psb|psd) ;&
 	psp|qtif|ra|raf|ram|raw|riff|rsrc|rtf|rw2|rwl|rwz|rm|so|sr2|srf|srw|svg) ;&
 	swf|thm|ttc|ttf|vrd|vsd|wdp|webp|webm|wma|wmv|wv|x3f|xcf|xlsx|xmp)
-		cat_exiftool ;;
-	avi|flv|mov|mkv|mp4|mpg|mpeg)
+		cat_exiftool && cat_exiftool_thumbnail ;;
 	### Video ###
-		cat_exiftool ;;
+	mod|mp4|avi|mkv|mpg|mpeg|mov|flv|qt)
+		case $mimetype in
+		video/3gpp2) ;&
+		video/3gpp) ;&
+		video/h261) ;&
+		video/h263) ;&
+		video/h264) ;&
+		video/jpeg) ;&
+		video/jpm) ;&
+		video/mj2) ;&
+		video/mp4) ;&
+		video/mpeg) ;&
+		video/ogg) ;&
+		video/quicktime) ;&
+		video/vnd.dece.hd) ;&
+		video/vnd.dece.mobile) ;&
+		video/vnd.dece.pd) ;&
+		video/vnd.dece.sd) ;&
+		video/vnd.dece.video) ;&
+		video/vnd.fvt) ;&
+		video/vnd.mpegurl) ;&
+		video/vnd.ms-playready.media.pyv) ;&
+		video/vnd.uvvu.mp4) ;&
+		video/vnd.vivo) ;&
+		video/webm) ;&
+		video/x-f4v) ;&
+		video/x-flc) ;&
+		video/x-fli) ;&
+		video/x-flv) ;&
+		video/x-m4v) ;&
+		video/x-matroska) ;&
+		video/x-mng) ;&
+		video/x-ms-asf) ;&
+		video/x-msvideo) ;&
+		video/x-ms-wm) ;&
+		video/x-ms-wmv) ;&
+		video/x-ms-wmx) ;&
+		video/x-ms-wvx) ;&
+		video/x-sgi-movie)
+			if [[ "$FORCE" == 1 ]] && [ $(command -v video-to-ascii) ]; then
+				cat_video_to_ascii
+				continue
+			fi
+		esac
+		cat_exiftool
+		;;
 	### Audio ###
 	flac)
-		cat_metaflac || cat_exiftool ;;
+		cat_metaflac || cat_exiftool
+		cat_metaflac_thumbnail || cat_exiftool_thumbnail
+		;;
 	mp3|fla|ogg|wav)
 		cat_exiftool ;;
 	*)
@@ -1077,7 +1449,8 @@ do
 		esac
 	esac
 
-	if [[ $? != 0 ]]; then
+	rc=$?
+	if [[ $rc != 0 ]] && [[ $rc != 99 ]]; then
 		file -b "$INPUT"
 		echo "${mimetype} ($INPUT) (extension = $extension)"
 	fi
