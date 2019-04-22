@@ -1123,12 +1123,47 @@ function cat_arj() {
 	fi
 }
 
+function cat_cat() {
+	[ ! $(command -v cat) ] && return 1
+
+	cat -- "$INPUT"
+}
+
+
+function cat_json_jq() {
+	[ ! $(command -v jq) ] && return 1
+
+	if [[ "$FORCE" = 1 ]]; then
+		jq -c . "$INPUT"
+	else
+		jq . "$INPUT"
+	fi
+}
+
+function cat_json_python() {
+	[ ! $(command -v python) ] && return 1
+
+	if [ $(command -v source-highlight) ]; then
+		cat "$INPUT" | python -mjson.tool | source-highlight -f esc -o STDOUT -s "json"
+	else
+		cat "$INPUT" | python -mjson.tool
+	fi
+}
+
+function cat_js_jsbeautify() {
+	[ ! $(command -v js-beautify) ] && return 1
+
+	if [ $(command -v source-highlight) ] && [[ "$FORCE" = 0 ]]; then
+		js-beautify -- "$INPUT" | source-highlight -f esc -o STDOUT -s "js"
+	else
+		js-beautify -- "$INPUT"
+	fi
+}
+
 function cat_sourcecode() {
 	[ ! $(command -v source-highlight) ] && return 1
 
-	local src
-	src=$(source-highlight --lang-list | grep -E "^${extension} = ")
-	source-highlight --out-format=esc -o STDOUT -i "$INPUT" -s ${src:-txt}
+	source-highlight --out-format=esc -o STDOUT -i "$INPUT" -s $(sh-lang)
 }
 
 function cat_pdftotext() {
@@ -1157,8 +1192,8 @@ function cat_exiftool_thumbnail() {
 
 	# Printing thumnails is useful for raw photo images that otherwise need special software
 	# to handle and convert. For large JPEG images that include thumbnails, however, we have
-	# better performance running the full image through jp2a than extracting the (smaller)
-	# thumbnail and parsing that instead.
+	# better performance running the full image through jp2a compared to extracting the
+	# (smaller) thumbnail and parsing that instead.
 	if [[ ! -z "$(exiftool "$INPUT" -ThumbnailImage)" ]]; then
 		exiftool "$INPUT" -ThumbnailImage -b | convert - jpg:- | jp2a --invert --colors --width="$(tput cols)" -
 		return 0
@@ -1169,7 +1204,6 @@ function cat_exiftool_thumbnail() {
 
 	return 99
 }
-
 
 function cat_metaflac() {
 	[ ! $(command -v metaflac) ] && return 1
@@ -1218,6 +1252,16 @@ function cat_video_to_ascii() {
 	video-to-ascii -f "$INPUT" && clear
 }
 
+# source-highlight deduces the language based on the file extension, so this is slightly redundant,
+# but it allows us to use a default (txt) when the file extension is not recognised by the
+# application. This is also needed when piping code through standard input.
+function sh-lang() {
+	local src
+	src=$(source-highlight --lang-list | grep -E "^${extension} = ")
+	src=${src%% =*}
+	echo "${src:-txt}"
+}
+
 if [[ $# == 0 ]]; then
 	set -- '-h'
 fi
@@ -1242,15 +1286,52 @@ while (( $# )); do
 		shift
 		args_format="  %-31s%s\n"
 		
-		printf "%s\n\n" "Usage: xcat [FILE]..."
-		printf "%s\n\n" "Extended cat utility that chooses an appropriate command line tool based on the file extension to concatenate and print file content to the standard output."
-		printf "%s\n" "This script may refer to the following command line tools:"
-		printf "    %s\n" "cat (default), zcat, bzcat, lzip, pdftotext, 7z, arj, tar, exiftool, unoconv, ufraw-batch,"
-		printf "    %s\n" "convert (imagemagick), jp2a, metaflac, lsd, source-highlight, video-to-ascii"
-		printf "\n%s\n" "Some of the above may need to be installed, try:"
-		printf "    %s\n\n" "sudo apt-get install odt2txt"
-		echo
-	exit
+		printf "%s"  "Usage: xcat [OPTION?] [FILE]..."
+		printf "\n\n"
+		printf "%s " "Extended cat utility that chooses an appropriate command line tool based"
+		printf "%s " "on the file extension to concatenate and print file content to the"
+		printf "%s"  "standard output."
+		printf "\n\n"
+		printf "$args_format" "-h, --help" "this help page"
+		printf "$args_format" "-f, --force" "this typically enables alternate output for"
+		printf "$args_format" "" "the given file type"
+		printf "$args_format" "-o, --open" "attempts to open the file in the application"
+		printf "$args_format" "" "associated with the file type"
+		printf "$args_format" "    --mime" "prints the mime type of the file only"
+		printf "\n\n"
+		printf "%s " "In order to take full advantage of xcat below are the recommended packages"
+		printf "%s " "to install. You will most likely not need all of them and it will depend"
+		printf "%s"  "largely on what kind of files you generally work with."
+		printf "\n\n"
+		printf "%s\n" "=== Archives ==="
+		printf "   - %-28s%s\n" "p7zip-full"                "for 7z"
+		printf "   - %-28s%s\n" "gzip"                      "for zcat, gzip"
+		printf "   - %-28s%s\n" "bzip2"                     "for bzcat"
+		printf "   - %-28s%s\n" "lzip"                      "for lzip"
+		printf "   - %-28s%s\n" "arj"                       "for arj"
+		printf "   - %-28s%s\n" "zip"                       "for unzip"
+		printf "   - %-28s%s\n" "rar"                       "for unrar"
+		printf "   - %-28s%s\n" "tar"                       "for tar"
+		printf "   - %-28s%s\n" "zstd"                      "for zstdcat"
+		printf "%s\n" "=== Audio ==="
+		printf "   - %-28s%s\n" "flac"                      "for metaflac (extracts metadata)"
+		printf "%s\n" "=== Documents ==="
+		printf "   - %-28s%s\n" "unoconv"                   "for unoconv (converts many file formats)"
+		printf "   - %-28s%s\n" "poppler-utils"             "for pdftotext"
+		printf "%s\n" "=== Images ==="
+		printf "   - %-28s%s\n" "ufraw-batch"               "for ufraw-batch"
+		printf "   - %-28s%s\n" "imagemagick"               "for convert (converts images)"
+		printf "   - %-28s%s\n" "jp2a"                      "for jp2a (converts jpeg images to ascii)"
+		printf "   - %-28s%s\n" "libimage-exiftool-perl"    "for exiftool (extracts metadata)"
+		printf "%s\n" "=== Miscellaneous ==="
+		printf "   - %-28s%s\n" "lsd"                       "for lsd (ls-deluxe, for directories)"
+		printf "%s\n" "=== Source Code ==="
+		printf "   - %-28s%s\n" "source-highlight"          "for source-highlight (syntax highlighting)"
+		printf "   - %-28s%s\n" "jq"                        "for jq (json beautifier)"
+		printf "   - %-28s%s\n" "jsbeautifier"              "for js-beautify (python library)"
+		printf "%s\n" "=== Videos ==="
+		printf "   - %-28s%s\n" "video-to-ascii"            "for converting videos to ascii (python library)"
+		printf "\n"
 		exit
 		;;
 	*) # all other parameters
@@ -1329,28 +1410,31 @@ do
 		esac
 		;;
 	7z|cab|cpio|rpm|deb|pptm)
-		cat_7z
-		;;
+		cat_7z ;;
 	jar|zip)
 		cat_zip ;;
 	lz)
 		[ $(command -v lzip) ] && lzip -d -c "$INPUT" ;;
 	### Scripts ###
+	js|javascript)
+		cat_js_jsbeautify || cat_sourcecode || cat_cat ;;
+	json)
+		cat_json_jq || cat_json_python || cat_sourcecode || cat_cat ;;
 	c|f77|f90|h|ac|ada|adb|am|applescript|asm|autoconf|awk|bash|bat|batch) ;&
 	bib|bison|c|caml|cbl|cc|changelog|clipper|cls|cobol|coffee|coffeescript) ;&
 	conf|cpp|cs|csh|csharp|css|ctp|cxx|d|desktop|diff|dmd|docbook|dtx|el|eps) ;&
 	erl|erlang|errors|f|f77|f90|feature|fixed-fortran|flex|fortran|free-fortran) ;&
 	glsl|go|groovy|h|haskell|haxe|hh|hpp|hs|htm|html|hx|hxx|in|ini|islisp|java) ;&
-	javalog|javascript|js|json|kcfg|kdevelop|kidl|ksh|l|lang|langdef|latex|ldap) ;&
+	javalog|kcfg|kdevelop|kidl|ksh|l|lang|langdef|latex|ldap) ;&
 	ldif|lex|lgt|lhs|lilypond|lisp|ll|log|logtalk|lsm|lua|ly|m4|makefile|manifest) ;&
 	mf|ml|mli|moc|opa|outlang|oz|p|pas|pascal|patch|pc|perl|php|php3|php4|php5) ;&
 	pkgconfig|pl|pm|po|postscript|pot|prg|prolog|properties|proto|protobuf|ps) ;&
 	py|python|r|rb|rc|ruby|s|scala|scheme|scm|scpt|sh|shell|sig|sl|slang|slsh) ;&
 	sml|spec|sql|sty|style|syslog|tcl|tcsh|tex|texi|texinfo|tk|tml|ui|upc) ;&
 	vala|vbs|vbscript|xhtml|xml|xorg|y|yacc|yy|zsh|apj|ssl|xml)
-		cat_sourcecode ;;
+		cat_sourcecode || cat_cat ;;
 	txt)
-		cat -- "$INPUT" ;;
+		cat_cat ;;
 	### Documents ###
 	pdf)
 		cat_pdftotext || cat_unoconv ;;
@@ -1440,7 +1524,18 @@ do
 		text/plain)
 			cat "$INPUT" ;;
 		inode/directory)
-			[ $(command -v lsd) ] && lsd -l "$INPUT" || ls -l --color "$INPUT" ;;
+			if [[ "$FORCE" == 1 ]]; then
+				if [ $(command -v lsd) ]; then
+					lsd --tree "$INPUT"
+				elif [ $(command -v tree) ]; then
+					tree "$INPUT"
+				else
+					ls -l --color "$INPUT"
+				fi
+			else
+				[ $(command -v lsd) ] && lsd -l "$INPUT" || ls -l --color "$INPUT"
+			fi
+			;;
 		application/x-executable)
 			file -b "$INPUT" ;;
 		*)
