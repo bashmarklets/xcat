@@ -19,13 +19,19 @@ are installed).
 Clone this repository and ensure that the directory containing the `xcat` file is in your PATH
 environment variable.
 
-Depending on your needs you may want to make sure that the following applications or packages are
-installed:
+Depending on your needs you may want to make sure that the following packages are installed:
 
 ```
-cat, zcat, bzcat, lzip, arj, tar, 7z, pdftotext, exiftool, unoconv, ufraw-batch, convert
-(imagemagick), jp2a, metaflac, lsd, source-highlight
+p7zip-full, gzip, bzip2, lzip, arj, zip, rar, tar, zstd, flac, unoconv, poppler-utils, ufraw-batch,
+imagemagick, jp2a, libimage-exiftool-perl, lsd, source-highlight, jq
 ```
+
+and these Python libraries via pip / pip3:
+```
+jsbeautifier, video-to-ascii
+```
+
+See `xcat --help` for more details on these recommended packages.
 
 ## Disclaimer
 
@@ -39,12 +45,14 @@ Feedback and example files / suggestions for additional support would be very ap
 - handles compressed files (.tar, .bz, .bz2, .xz, .lz, .gz, .arj, .rar, .zst, .jar, .zip, and more)
     - lists files if archive contains more than one file (where applicable)
 - runs a variety of scripts and code files through `source-highlight` for easier reading
+- beautifies JSON files via `jq` or `python`
+- beautifies JavaScript files via `js-beautify`
 - runs PDF files through `pdftotext` if installed
 - runs a variety of document types, spreadsheets and presentation formats through `unoconv`
 - extracts EXIF metadata from a variety of audio and video files using `exiftool`
 - extracts metadata from FLAC files using `metaflac` if installed
 - converts image files into ascii for a visual representation on the command line using `jp2a`
-- lists directories using `lsd` if installed
+- lists directories using `lsd` or `tree` if installed
 - passing the `-f` (`--force`) parameter some times produces an alternative output of the same file
 - gives basic information about the file if file type is not recognised (or if relevant
 applications are not installed)
