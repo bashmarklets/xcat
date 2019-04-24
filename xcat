@@ -745,6 +745,9 @@ function deduce_extension_from_mimetype() {
 	application/xslt+xml) echo "xslt" ;;
 	application/x-snappy-framed) echo "$mimetype" ;;
 	application/xspf+xml) echo "xspf" ;;
+	application/x-sqlite) echo "sqlite" ;;
+	application/x-sqlite2) echo "sqlite2" ;;
+	application/x-sqlite3) echo "sqlite3" ;;
 	application/x-stuffit) echo "sit" ;;
 	application/x-stuffitx) echo "sitx" ;;
 	application/x-sv4cpio) echo "sv4cpio" ;;
@@ -1222,6 +1225,21 @@ function cat_metaflac_thumbnail() {
 	return 99
 }
 
+function cat_sqlite3() {
+	[ ! $(command -v sqlite3) ] && return 1
+
+	if [[ "$FORCE" = 1 ]]; then
+		local QUERY="select sql from sqlite_master"
+		if [ $(command -v source-highlight) ]; then
+			sqlite3 "$INPUT" "$QUERY" | source-highlight -f esc -o STDOUT -s "sql"
+		else
+			sqlite3 "$INPUT" "$QUERY"
+		fi
+	else
+		sqlite3 "$INPUT" .tables
+	fi
+}
+
 function cat_jp2a() {
 	[ ! $(command -v jp2a) ] && return 1
 
@@ -1315,6 +1333,8 @@ while (( $# )); do
 		printf "   - %-28s%s\n" "zstd"                      "for zstdcat"
 		printf "%s\n" "=== Audio ==="
 		printf "   - %-28s%s\n" "flac"                      "for metaflac (extracts metadata)"
+		printf "%s\n" "=== Databases ==="
+		printf "   - %-28s%s\n" "sqlite3"                   "for sqlite3 databases (list tables / schema)"
 		printf "%s\n" "=== Documents ==="
 		printf "   - %-28s%s\n" "unoconv"                   "for unoconv (converts many file formats)"
 		printf "   - %-28s%s\n" "poppler-utils"             "for pdftotext"
@@ -1519,6 +1539,16 @@ do
 		;;
 	mp3|fla|ogg|wav)
 		cat_exiftool ;;
+	### Databases ###
+	db|db2|db3|sdb|s2db|s3db|sqlite|sqlite2|sqlite3|sl2|sl3)
+		case $mimetype in
+		application/x-sqlite) ;&
+		application/x-sqlite2) ;&
+		application/x-sqlite3)
+			cat_sqlite3
+		esac
+		;;
+	### Other ###
 	*)
 		case $mimetype in 
 		text/plain)

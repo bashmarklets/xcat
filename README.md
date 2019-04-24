@@ -11,8 +11,8 @@ I mostly just want to have a peak inside the file to get a feel for what it is a
 same reason I kind of would like to also be able to do the same with MS Word .doc files getting
 text instead of scrambled binary data. What about .pdf files? And what about .jpg images?
 
-So I ended up creating `xcat`; one feline to rule them all by leveraging different tools (if they
-are installed).
+So I ended up creating `xcat`; one feline to rule them all by leveraging different tools (should
+they be installed).
 
 ## How to install
 
@@ -57,3 +57,4 @@ Feedback and example files / suggestions for additional support would be very ap
 - gives basic information about the file if file type is not recognised (or if relevant
 applications are not installed)
 - can deduce file extension based on mime type in some situations
+- lists tables for sqlite3 databases and schema when forced
